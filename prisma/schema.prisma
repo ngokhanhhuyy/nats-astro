@@ -1,0 +1,180 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model SliderItem {
+  id           Int     @id @default(autoincrement())
+  title        String? @db.VarChar(100)
+  thumbnailUrl String? @map("thumbnail_url") @db.VarChar(255)
+  index        Int     @default(0)
+
+  @@map("slider_items")
+}
+
+model SummaryItem {
+  id             Int     @id @default(autoincrement())
+  name           String  @db.VarChar(25)
+  summaryContent String  @map("summary_content") @db.VarChar(255)
+  detailContent  String  @map("detail_content") @db.VarChar(3000)
+  thumbnailUrl   String? @map("thumbnail_url") @db.VarChar(255)
+
+  @@map("summary_items")
+}
+
+model AboutUsIntroduction {
+  id                   Int           @id @default(autoincrement())
+  thumbnailUrl         String?       @map("thumbnail_url") @db.VarChar(1000)
+  thumbnailType        ThumbnailType @default(Photo) @map("thumbnail_type")
+  mainQuoteContent     String        @map("main_quote_content") @db.VarChar(1000)
+  aboutUsContent       String        @map("about_us_content") @db.VarChar(1500)
+  whyChooseUsContent   String        @map("why_choose_us") @db.VarChar(1500)
+  ourDifferenceContent String        @map("our_difference_content") @db.VarChar(1500)
+  ourCultureContent    String        @map("our_culture_content") @db.VarChar(1500)
+
+  @@map("about_us_introductions")
+}
+
+model Member {
+  id           Int     @id @default(autoincrement())
+  fullName     String  @map("member") @db.VarChar(50)
+  roleName     String  @map("role_name") @db.VarChar(50)
+  description  String  @db.VarChar(400)
+  thumbnailUrl String? @map("thumbnail_url") @db.VarChar(255)
+
+  @@map("members")
+}
+
+model Certificate {
+  id           Int     @id @default(autoincrement())
+  name         String? @db.VarChar(100)
+  thumbnailUrl String  @map("thumbnail_url") @db.VarChar(255)
+  @@map("certificates")
+}
+
+model CatalogItem {
+  id           Int             @id @default(autoincrement())
+  name         String          @db.VarChar(50)
+  type         CatalogItemType
+  summary      String          @db.VarChar(255)
+  detail       String          @db.LongText
+  thumbnailUrl String?         @map("thumbnail_url") @db.VarChar(255)
+
+  @@map("catalog_items")
+}
+
+model Contact {
+  id      Int         @id @default(autoincrement())
+  type    ContactType
+  content String      @db.VarChar(255)
+
+  @@map("contacts")
+}
+
+model Enquiry {
+  int Int @id @default(autoincrement())
+  fullName String @db.VarChar(50) @map("full_name")
+  email String? @db.VarChar(255)
+  phoneNumber String @db.VarChar(15) @map("phone_number")
+  content String @db.VarChar(1000)
+  receivedDateTime DateTime @default(now()) @map("received_datetime")
+  isCompleted Boolean @default(false) @map("is_completed")
+
+  @@map("enquiries")
+}
+
+model GeneralSettings {
+  id Int @id @default(autoincrement())
+  applicationName String @db.VarChar(100) @map("application_name")
+  applicationShortName String @db.VarChar(15) @map("application_short_name")
+  isUnderMaintainance Boolean @default(false) @map("is_under_maintainance")
+
+  @@map("general_settings")
+}
+
+model Post {
+  id Int @id @default(autoincrement())
+  title String @db.VarChar(150)
+  uniqueTitle String @db.VarChar(255) @unique @map("unique_title")
+  thumbnailUrl String? @db.VarChar(255) @map("thumbnail_url")
+  content String @db.LongText
+  createdDateTime DateTime @default(now()) @map("created_datetime")
+  updatedDateTime DateTime? @map("updated_datetime")
+  isPinned Boolean @default(false) @map("is_pinned")
+  isPublished Boolean @default(false) @map("is_published")
+  views Int @default(0)
+  authorId Int @map("author_id")
+  author User @relation(fields: [authorId], references: [id])
+  
+  @@map("posts")
+}
+
+model TrafficByHour {
+  id Int @id @default(autoincrement())
+  recordedDateTime DateTime @default(now()) @map("recorded_datetime")
+  accessCount Int @default(0) @map("access_count")
+  guestCount Int @default(0) @map("guest_count")
+  trafficByDateId Int @map("traffic_by_date_id")
+  trafficByDate TrafficByDate @relation(fields: [trafficByDateId], references: [id])
+
+  @@map("traffic_by_hours")
+}
+
+model TrafficByDate {
+  id Int @id @default(autoincrement())
+  recordedDateTime DateTime @default(now()) @map("recorded_datetime")
+  accessCount Int @default(0) @map("access_count")
+  guestCount Int @default(0) @map("guest_count")
+  trafficByHours TrafficByHour[]
+
+  @@map("traffic_by_dates")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  userName String @db.VarChar(50) @map("username") @unique
+  passwordHash String @db.VarChar(255) @map("password_hash")
+  permissions UserPermission[]
+  posts Post[]
+  
+  @@map("users")
+}
+
+model UserPermission {
+  id Int @id @default(autoincrement())
+  canCreateUser Boolean @default(false) @map("can_create_user")
+  canResetUserPassword Boolean @default(false) @map("can_reset_user_password")
+  canDeleteUser Boolean @default(false) @map("can_delete_user")
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("user_permissions")
+}
+
+enum ThumbnailType {
+  Photo
+  YoutubeVideo
+
+  @@map("thumbnail_type")
+}
+
+enum CatalogItemType {
+  Service
+  Course
+  Product
+
+  @@map("catalog_item_type")
+}
+
+enum ContactType {
+  PhoneNumber
+  ZaloNumber
+  Email
+  Address
+
+  @@map("contact_type")
+}
