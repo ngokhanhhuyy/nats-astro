@@ -1,16 +1,17 @@
 ---
 import { actions } from "astro:actions";
-import { z } from "astro:schema";
+import { z, ZodNullable } from "astro:schema";
 import { generateTokenAsync } from "@/services/authenticationService";
-import { createSignInModel } from "@/models/signInModels";
+import { SignInModel } from "@/models/signInModels";
 
-let model: SignInModel;
+let model = new SignInModel();
 let token: string | null = null;
 if (Astro.request.method === "GET") {
-  model = createSignInModel();
+  model = new SignInModel();
 } else {
   try {
-    model = createSignInModel(await Astro.request.formData());
+    model.parse(await Astro.request.formData());
+    model.validate();
     token = await generateTokenAsync(model.toRequestDto());
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -37,10 +38,10 @@ if (Astro.request.method === "GET") {
       <pre>{JSON.stringify(Astro.locals.modelErrorMessagesStore ?? null, null, 2)}</pre>
       <form id="signInForm" method="post">
         <label for="userName">UserName</label>
-        <input name="userName" id="userName" />
+        <input name="userName" id="userName" value={model?.userName} />
         <br />
         <label for="password">Password</label>
-        <input name="password" id="password" type="password" />
+        <input name="password" id="password" type="file" />
         <br />
         <button type="submit">Submit</button>
       </form>

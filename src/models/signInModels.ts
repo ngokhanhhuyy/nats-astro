@@ -1,38 +1,34 @@
-import { zfd as zodForm } from "zod-form-data";
-import { z as zod } from "astro:schema";
+import { z } from "astro:schema";
+import { zfd } from "zod-form-data";
 
-declare global {
-  type SignInModel = {
-    userName: string;
-    password: string;
-    toRequestDto(): SignInRequestDto;
-  };
-}
-
-const signInSchema = zodForm.formData({
-  userName: zodForm.text(zod.string({ required_error: "Username is required" })),
-  password: zodForm.text(zod.string({ required_error: "Password is required" }))
+const parser = zfd.formData({
+  userName: zfd.text(z.string()),
+  password: zfd.text(z.string())
 });
 
-function create(formData?: FormData): SignInModel {
-  const model  = {
-    userName: "",
-    password: "",
-    toRequestDto(): SignInRequestDto {
-      return {
-        userName: model.userName,
-        password: model.password,
-      };
-    },
-  }
-  
-  if (formData) {
-    const parsedData = signInSchema.parse(formData);
-    model.userName = parsedData.userName;
-    model.password = parsedData.password;
+const validator = z.object({
+  userName: z.string().min(6),
+  password: z.string().min(6)
+});
+
+export class SignInModel {
+  public userName: string = "";
+  public password: string = "";
+
+  public toRequestDto(): SignInRequestDto {
+    return {
+      userName: this.userName,
+      password: this.password
+    };
   }
 
-  return model;
+  public parse(formData: FormData): void {
+    const parsedData = parser.parse(formData);
+    this.userName = parsedData.userName;
+    this.password = parsedData.password;
+  }
+
+  public validate(): void {
+    validator.parse(this);
+  }
 }
-
-export { create as createSignInModel }
