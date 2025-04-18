@@ -1,5 +1,7 @@
-import { AuthenticationError } from "@/errors";
-import * as api from "./api";
+import { PrismaClient } from "@prisma/client";
+import { generateToken, verifyToken } from "@/utils/jwtUtils";
+import { verifyPasswordAsync } from "@/utils/passwordUtils";
+import { AuthenticationError, OperationError } from "@/errors";
 
 /**
  * Signs in with the specified username and password using cookies.
@@ -12,7 +14,8 @@ import * as api from "./api";
  * @param requestDto - An object containing the username and password for the
  * authentication operation.
  * @returns A {@link Promise} representing the asynchronous operation, which result is
- * a {@link number} representing the id of the user who has been signed in.
+ * a {@link number} representing authentication token for the user to use in the following
+ * requests.
  * @example
  * getAccessCookieAsync({ userName: "yourUserName", password: "yourPassword" });
  *
@@ -21,43 +24,32 @@ import * as api from "./api";
  * deleted.
  * - When the specified password is incorrect.
  */
-async function signInAsync(requestDto: SignInRequestDto): Promise<number> {
-  return await api.postAsync("/authentication/getAccessCookie", requestDto);
-};
-
-/**
- * Signs out and clear the cookies which contains the authentication credentials from
- * the requesting user.
- *
- * @returns A {@link Promise} representing the asynchronous operation.
- * @example signOutAsync();
- */
-async function signOutAsync(): Promise<void> {
-  await api.postAndIgnoreAsync("/authentication/clearAccessCookie", {});
-};
-
-/**
- * Checks the authentication status of the requesting user.
- *
- * @remarks The operation is performed by sending a request containing the cookie
- * (when the authentication method is using access cookies) or the access token (when
- * the authentication method is using access token) in the header to the API endpoint
- * in order to check if the user has been authenticated.
- *
- * @returns A {@link Promise} representing the asynchronous operation, which result is
- * a {@link boolean} value representing whether the requesting is authenticated.
- */
-async function checkAuthenticationStatusAsync(): Promise<boolean> {
-  try {
-    await api.getAsync("/authentication/checkAuthenticationStatus", undefined, 0);
-    return true;
-  } catch (error) {
-    if (error instanceof AuthenticationError) {
-      return false;
+async function generateTokenAsync(requestDto: SignInRequestDto): Promise<string> {
+  const prisma = new PrismaClient();
+  const user = await prisma.user.findFirst({
+    where: {
+      userName: requestDto.userName
+    },
+    include: {
+      permission: true
     }
+  });
 
-    throw error;
+  if (!user) {
+    throw new OperationError({ userName: "User doesn't exist." });
   }
+
+  if (!verifyPasswordAsync(requestDto.password, user.passwordHash)) {
+    throw new OperationError({ password: "Password is incorrect." });
+  }
+
+  return generateToken({
+    id: user.id,
+    userName: user.userName,
+    canCreateUser: user.permission?.canCreateUser ?? false,
+    canResetUserPassword: user.permission?.canResetUserPassword ?? false,
+    canDeleteUser: user.permission?.canDeleteUser ?? false
+  }, 30 * 24);
 };
 
-export { signInAsync, signOutAsync, checkAuthenticationStatusAsync };
+export { generateTokenAsync };

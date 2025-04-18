@@ -1,11 +1,11 @@
-export type ModelErrors = Record<string, string[]>;
+export type ModelErrorMessages = Record<string, string>;
 
 class IncludingMessagesError extends Error {
-  public readonly errorMessages: ModelErrors;
+  public readonly errorMessages: ModelErrorMessages;
 
-  constructor(modelStateErrors: ModelErrors) {
+  constructor(modelErrorMessages: ModelErrorMessages) {
     super();
-    this.errorMessages = modelStateErrors;
+    this.errorMessages = modelErrorMessages;
   }
 }
 

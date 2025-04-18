@@ -1,24 +1,40 @@
 ---
 import { actions } from "astro:actions";
 import { z } from "astro:schema";
+import { generateTokenAsync } from "@/services/authenticationService";
+import { createSignInModel } from "@/models/signInModels";
 
-const SignInModel = z.object({
-    userName: z.string({ required_error: "Username is required" }),
-    password: z.string({ required_error: "Password is required" }),
-})
+let model: SignInModel;
+let token: string | null = null;
+if (Astro.request.method === "GET") {
+  model = createSignInModel();
+} else {
+  try {
+    model = createSignInModel(await Astro.request.formData());
+    token = await generateTokenAsync(model.toRequestDto());
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errorMessages: Record<string, string> = {};
+      for (const issue of error.issues) {
+        const path = issue.path.map(segment => {
+          return typeof segment === "string" ? segment : `[${segment}]`;
+        }).join(".");
 
-type SignInModel = z.infer<typeof SignInModel>;
+        errorMessages[path] = issue.message;
+      }
 
-
-
-if (Astro.request.method === "POST") {
-  
+      Astro.locals.modelErrorMessagesStore.setErrorMessages(errorMessages)
+    }
+  }
 }
 ---
 
 <html>
   <body>
     <div class="container">
+      <pre>{JSON.stringify(model?.toRequestDto() ?? null, null, 2)}</pre>
+      <pre>{JSON.stringify(token, null, 2)}</pre>
+      <pre>{JSON.stringify(Astro.locals.modelErrorMessagesStore ?? null, null, 2)}</pre>
       <form id="signInForm" method="post">
         <label for="userName">UserName</label>
         <input name="userName" id="userName" />
@@ -34,25 +50,6 @@ if (Astro.request.method === "POST") {
     </div>
   </body>
 </html>
-
-<script>
-  import { actions } from "astro:actions";
-
-  const form = document.getElementById("signInForm") as HTMLFormElement;
-  if (form) {
-    form.addEventListener("submit", async (event: SubmitEvent) => {
-      event.preventDefault();
-      const formData = new FormData(form);
-      const { data, error } = await actions.signIn(formData);
-
-      const dataElement = document.getElementById("data") as HTMLPreElement;
-      dataElement.innerText = JSON.stringify(data, null, 2);
-
-      const errorElement = document.getElementById("error") as HTMLPreElement;
-      errorElement.innerText = JSON.stringify(error, null, 2);
-    });
-  }
-</script>
 
 <style>
   body {
