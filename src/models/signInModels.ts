@@ -2,8 +2,8 @@ import { z } from "astro:schema";
 import { zfd } from "zod-form-data";
 
 const parser = zfd.formData({
-  userName: zfd.text(z.string()),
-  password: zfd.text(z.string())
+  userName: zfd.text(z.string().min(6).default("")),
+  password: zfd.text(z.string().min(6).default(""))
 });
 
 const validator = z.object({

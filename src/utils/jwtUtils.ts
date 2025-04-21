@@ -22,7 +22,7 @@ function generateToken(responseDto: UserDetailResponseDto, expiresInHours: numbe
     user: responseDto
   };
 
-  return jwt.sign(payload, secretKey, { expiresIn: expiresInHours * 60 * 60 * 1000 });
+  return jwt.sign(payload, secretKey);
 }
 
 function verifyToken(token: string): Payload {

@@ -218,12 +218,12 @@ export async function generateAsync() {
   await prisma.$transaction(async (transaction) => {
     await generateUsersAsync(transaction);
     await generateUserPermissionsAsync(transaction);
-    await Promise.all([
-      generateSliderItemsAsync(transaction),
-      generateSummaryItemsAsync(transaction),
-      generateAboutUsIntroductionAsync(transaction),
-      generateMembersAsync(transaction),
-      generateCertificatesAsync(transaction),
-    ]);
+    await generateSliderItemsAsync(transaction);
+    await generateSummaryItemsAsync(transaction);
+    await generateAboutUsIntroductionAsync(transaction);
+    await generateMembersAsync(transaction);
+    await generateCertificatesAsync(transaction);
   });
 }
+
+await generateAsync();

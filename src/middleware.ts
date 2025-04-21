@@ -1,9 +1,9 @@
 import { defineMiddleware } from "astro:middleware";
-import { generateAsync } from "../database/dataInitializer";
+import { generateAsync } from "../prisma/database/dataInitializer";
 import { createModelErrorMessagesStore } from "./utils/modelErrorUtils";
 
 export const onRequest = defineMiddleware(async (context, next) => {
-  await generateAsync();
+  // await generateAsync();
   context.locals.modelErrorMessagesStore = createModelErrorMessagesStore();
   return next();
 });
