@@ -1,34 +1,49 @@
+import { ValidationError } from "@/errors";
 import { z } from "astro:schema";
-import { zfd } from "zod-form-data";
+import dot from "dot-object";
 
-const parser = zfd.formData({
-  userName: zfd.text(z.string().min(6).default("")),
-  password: zfd.text(z.string().min(6).default(""))
+declare global {
+  type SignInModel = {
+    userName: string;
+    password: string;
+    parseFromForm(formData: FormData): void;
+    toRequestDto(): SignInRequestDto;
+  };
+}
+
+const parser = z.object({
+  userName: z.string().min(1, { message: "Username cannot be left empty." }),
+  password: z.string().min(1, { message: "Password cannot be left empty." })
 });
 
-const validator = z.object({
-  userName: z.string().min(6),
-  password: z.string().min(6)
-});
+export function createSignInModel(): SignInModel {
+  const model: SignInModel = {
+    userName: "",
+    password: "",
+    parseFromForm(formData: FormData) {
+      const formDataAsObject: Partial<Record<string, FormDataEntryValue>> = { };
+      for (const [path, value] of formData.entries()) {
+        formDataAsObject[path] = value;
+      }
+      try {
+        const parsedData = parser.parse(dot.object(formDataAsObject));
+        model.userName = parsedData.userName;
+        model.password = parsedData.password;
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          throw new ValidationError(error);
+        }
 
-export class SignInModel {
-  public userName: string = "";
-  public password: string = "";
+        throw error;
+      }
+    },
+    toRequestDto() {
+      return {
+        userName: this.userName,
+        password: this.password
+      }
+    }
+  };
 
-  public toRequestDto(): SignInRequestDto {
-    return {
-      userName: this.userName,
-      password: this.password
-    };
-  }
-
-  public parse(formData: FormData): void {
-    const parsedData = parser.parse(formData);
-    this.userName = parsedData.userName;
-    this.password = parsedData.password;
-  }
-
-  public validate(): void {
-    validator.parse(this);
-  }
+  return model;
 }

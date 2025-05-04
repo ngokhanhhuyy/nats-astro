@@ -214,7 +214,17 @@ async function generateCatalogItemsAsync(transaction: PrismaTransactionalClient)
   }
 }
 
-export async function generateAsync() {
+async function generateGeneralSettingsAsync(transaction: PrismaTransactionalClient) {
+  await prisma.generalSettings.create({
+    data: {
+      applicationName: "Trung tâm Khoa học Đào tạo và Thẩm mỹ Quốc Gia",
+      applicationShortName: "NATS",
+      isUnderMaintainance: false
+    }
+  });
+}
+
+export async function main() {
   await prisma.$transaction(async (transaction) => {
     await generateUsersAsync(transaction);
     await generateUserPermissionsAsync(transaction);
@@ -223,7 +233,9 @@ export async function generateAsync() {
     await generateAboutUsIntroductionAsync(transaction);
     await generateMembersAsync(transaction);
     await generateCertificatesAsync(transaction);
+    await generateCatalogItemsAsync(transaction);
+    await generateGeneralSettingsAsync(transaction);
   });
 }
 
-await generateAsync();
+main().catch(error => console.error(error)).finally(async () => await prisma.$disconnect());

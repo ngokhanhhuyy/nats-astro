@@ -3,6 +3,7 @@
 declare namespace App {
   interface Locals {
     modelErrorMessagesStore: import("@/utils/modelErrorUtils").IModelErrorMessagesStore;
-    isAuthenticated: boolean;
+    caller: UserDetailModel | null;
+    generalSettings: GeneralSettingsDetailModel;
   }
 }

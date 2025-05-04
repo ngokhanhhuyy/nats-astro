@@ -26,7 +26,6 @@ import { AuthenticationError, OperationError } from "@/errors";
  */
 async function generateTokenAsync(requestDto: SignInRequestDto): Promise<string> {
   const prisma = new PrismaClient();
-  const currentDateTime = new Date();
   const user = await prisma.user.findFirst({
     where: {
       userName: requestDto.userName
@@ -35,7 +34,6 @@ async function generateTokenAsync(requestDto: SignInRequestDto): Promise<string>
       permission: true
     }
   });
-  console.log((new Date().getTime() - currentDateTime.getTime()))
 
   if (!user) {
     throw new OperationError({ userName: "User doesn't exist." });

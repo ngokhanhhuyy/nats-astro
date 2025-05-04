@@ -1,0 +1,38 @@
+---
+import type { JSX } from "astro/jsx-runtime";
+import { compute } from "@/utils/computeUtils";
+
+// Props.
+type Props = {
+  name: string;
+  displayName: string;
+  floating: boolean;
+} & JSX.HTMLAttributes;
+const props = Astro.props;
+
+// Computed.
+const computedClass = compute<string>(() => {
+  const names = [
+    "form-control",
+    props.floating &&"form-floating",
+    Astro.locals.modelErrorMessagesStore.getInputClass(props.name),
+  ]
+  return names.filter((n) => n).join(" ");
+});
+
+const hasError = compute<boolean>(() => {
+  return Astro.locals.modelErrorMessagesStore.hasError(props.name);
+});
+---
+
+<div {...props} class={computedClass}>
+  {!props.floating && <label class="form-label fw-bold small">{props.displayName}</label>}
+  <slot></slot>
+  {props.floating && <label class="form-label fw-bold small">{props.displayName}</label>}
+  
+  {hasError && (
+    <span class="text-danger">
+      {Astro.locals.modelErrorMessagesStore.getMessage(props.name)}
+    </span>
+  )}
+</div>

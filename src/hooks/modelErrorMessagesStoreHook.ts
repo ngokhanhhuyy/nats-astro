@@ -1,4 +1,7 @@
+import React, { useState, createContext } from "react";
 import type { ModelErrorMessages } from "@/errors";
+
+const ModelErrorMessagesStoreContext = createContext<IModelErrorMessagesStore | null>(null);
 
 /**
  * Inspired by ModelStateDictionary class and ModelState property in ASP.NET Core MVC, this
@@ -84,7 +87,7 @@ export interface IModelErrorMessagesStore {
    * @param propertyPath The path of the property in the model.
    * @returns Bootstrap class-name for the input element.
    */
-  readonly getInputClass: (propertyPath: string) => string | null;
+  readonly getInputClassName: (propertyPath: string) => string | null;
 
   /**
    * Get Bootstrap class name for message element based on the
@@ -93,12 +96,12 @@ export interface IModelErrorMessagesStore {
    * @param propertyPath The path of the property in the model.
    * @returns Bootstrap class-name for the message element.
    */
-  readonly getMessageClass: (propertyPath: string) => string | null;
+  readonly getMessageClassName: (propertyPath: string) => string | null;
 }
 
-export function createModelErrorMessagesStore(): IModelErrorMessagesStore {
-  let errorMessages: ModelErrorMessages = {};
-  let isValidated: boolean = false;
+function useModelErrorMessagesStore(): IModelErrorMessagesStore {
+  const [errorMessages, _setErrorMessages] = useState<ModelErrorMessages>({ });
+  const [isValidated, setIsValidated] = useState<boolean>(() => false);
 
   return {
     get errors(): ModelErrorMessages {
@@ -121,7 +124,7 @@ export function createModelErrorMessagesStore(): IModelErrorMessagesStore {
       }
 
       try {
-        return errorMessages[propertyPath as keyof typeof errorMessages] != null;
+        return errorMessages[propertyPath as keyof typeof errorMessages][0] != null;
       } catch {
         return false;
       }
@@ -133,29 +136,28 @@ export function createModelErrorMessagesStore(): IModelErrorMessagesStore {
       }
 
       try {
-        return errorMessages[propertyPath] || null;
+        return errorMessages[propertyPath][0] || null;
       } catch {
         return null;
       }
     },
 
     clearErrorMessages(): void {
-      errorMessages = {};
-      isValidated = false;
+      _setErrorMessages({ });
     },
 
     resetErrorMessages(): void {
       this.clearErrorMessages();
-      isValidated = false;
+      setIsValidated(false);
     },
 
     getMessage(propertyPath: string): string {
-      return isValidated ? (this.getError(propertyPath) || "Hợp lệ.") : "";
+      return this.getError(propertyPath) || "Hợp lệ.";
     },
 
     setErrorMessages(errors: ModelErrorMessages): void {
-      errorMessages = errors;
-      isValidated = true;
+      _setErrorMessages(errors);
+      setIsValidated(true);
     },
 
     getAllErrorMessages(): string[] {
@@ -178,14 +180,14 @@ export function createModelErrorMessagesStore(): IModelErrorMessagesStore {
       return errorMessages != null && Object.keys(errorMessages).length > 0;
     },
 
-    getInputClass(propertyPath: string): string | null {
+    getInputClassName(propertyPath: string): string | null {
       if (isValidated) {
         return this.hasError(propertyPath) ? "is-invalid" : "is-valid";
       }
       return null;
     },
 
-    getMessageClass(propertyPath: string): string | null {
+    getMessageClassName(propertyPath: string): string | null {
       if (isValidated) {
         return this.hasError(propertyPath) ? "text-danger" : "text-success";
       }
@@ -193,3 +195,5 @@ export function createModelErrorMessagesStore(): IModelErrorMessagesStore {
     },
   };
 }
+
+export { ModelErrorMessagesStoreContext, useModelErrorMessagesStore };

@@ -1,17 +1,16 @@
-generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
-datasource db {
-  provider = "sqlite"
-  url      = "file:./database/database.db"
+generator client {
+  provider = "prisma-client-js"
 }
 
 model SliderItem {
   id           Int     @id @default(autoincrement())
-  title        String?
-  thumbnailUrl String? @map("thumbnail_url")
+  title        String? @db.VarChar(100)
+  thumbnailUrl String? @map("thumbnail_url") @db.VarChar(255)
   index        Int     @default(0)
 
   @@map("slider_items")
@@ -19,51 +18,51 @@ model SliderItem {
 
 model SummaryItem {
   id             Int     @id @default(autoincrement())
-  name           String
-  summaryContent String  @map("summary_content")
-  detailContent  String  @map("detail_content")
-  thumbnailUrl   String? @map("thumbnail_url")
+  name           String  @db.VarChar(25)
+  summaryContent String  @map("summary_content") @db.VarChar(255)
+  detailContent  String  @map("detail_content") @db.VarChar(3000)
+  thumbnailUrl   String? @map("thumbnail_url") @db.VarChar(255)
 
   @@map("summary_items")
 }
 
 model AboutUsIntroduction {
   id                   Int           @id @default(autoincrement())
-  thumbnailUrl         String?       @map("thumbnail_url")
+  thumbnailUrl         String?       @map("thumbnail_url") @db.VarChar(1000)
   thumbnailType        ThumbnailType @default(Photo) @map("thumbnail_type")
-  mainQuoteContent     String        @map("main_quote_content")
-  aboutUsContent       String        @map("about_us_content")
-  whyChooseUsContent   String        @map("why_choose_us")
-  ourDifferenceContent String        @map("our_difference_content")
-  ourCultureContent    String        @map("our_culture_content")
+  mainQuoteContent     String        @map("main_quote_content") @db.VarChar(1000)
+  aboutUsContent       String        @map("about_us_content") @db.VarChar(1500)
+  whyChooseUsContent   String        @map("why_choose_us") @db.VarChar(1500)
+  ourDifferenceContent String        @map("our_difference_content") @db.VarChar(1500)
+  ourCultureContent    String        @map("our_culture_content") @db.VarChar(1500)
 
   @@map("about_us_introductions")
 }
 
 model Member {
   id           Int     @id @default(autoincrement())
-  fullName     String  @map("member")
-  roleName     String  @map("role_name")
-  description  String
-  thumbnailUrl String? @map("thumbnail_url")
+  fullName     String  @map("member") @db.VarChar(50)
+  roleName     String  @map("role_name") @db.VarChar(50)
+  description  String  @db.VarChar(400)
+  thumbnailUrl String? @map("thumbnail_url") @db.VarChar(255)
 
   @@map("members")
 }
 
 model Certificate {
   id           Int     @id @default(autoincrement())
-  name         String?
-  thumbnailUrl String  @map("thumbnail_url")
+  name         String? @db.VarChar(100)
+  thumbnailUrl String  @map("thumbnail_url") @db.VarChar(255)
   @@map("certificates")
 }
 
 model CatalogItem {
   id           Int             @id @default(autoincrement())
-  name         String        
+  name         String          @db.VarChar(50)
   type         CatalogItemType
-  summary      String        
-  detail       String
-  thumbnailUrl String?         @map("thumbnail_url")
+  summary      String          @db.VarChar(255)
+  detail       String          @db.LongText
+  thumbnailUrl String?         @map("thumbnail_url") @db.VarChar(255)
 
   @@map("catalog_items")
 }
@@ -71,17 +70,17 @@ model CatalogItem {
 model Contact {
   id      Int         @id @default(autoincrement())
   type    ContactType
-  content String    
+  content String      @db.VarChar(255)
 
   @@map("contacts")
 }
 
 model Enquiry {
   int Int @id @default(autoincrement())
-  fullName String @map("full_name")
-  email String?
-  phoneNumber String @map("phone_number")
-  content String
+  fullName String @db.VarChar(50) @map("full_name")
+  email String? @db.VarChar(255)
+  phoneNumber String @db.VarChar(15) @map("phone_number")
+  content String @db.VarChar(1000)
   receivedDateTime DateTime @default(now()) @map("received_datetime")
   isCompleted Boolean @default(false) @map("is_completed")
 
@@ -90,8 +89,8 @@ model Enquiry {
 
 model GeneralSettings {
   id Int @id @default(autoincrement())
-  applicationName String @map("application_name")
-  applicationShortName String @map("application_short_name")
+  applicationName String @db.VarChar(100) @map("application_name")
+  applicationShortName String @db.VarChar(15) @map("application_short_name")
   isUnderMaintainance Boolean @default(false) @map("is_under_maintainance")
 
   @@map("general_settings")
@@ -99,10 +98,10 @@ model GeneralSettings {
 
 model Post {
   id Int @id @default(autoincrement())
-  title String
-  uniqueTitle String @unique @map("unique_title")
-  thumbnailUrl String? @map("thumbnail_url")
-  content String
+  title String @db.VarChar(150)
+  uniqueTitle String @db.VarChar(255) @unique @map("unique_title")
+  thumbnailUrl String? @db.VarChar(255) @map("thumbnail_url")
+  content String @db.LongText
   createdDateTime DateTime @default(now()) @map("created_datetime")
   updatedDateTime DateTime? @map("updated_datetime")
   isPinned Boolean @default(false) @map("is_pinned")
@@ -137,8 +136,8 @@ model TrafficByDate {
 
 model User {
   id Int @id @default(autoincrement())
-  userName String @map("username") @unique
-  passwordHash String @map("password_hash")
+  userName String @db.VarChar(50) @map("username") @unique
+  passwordHash String @db.VarChar(255) @map("password_hash")
   permission UserPermission?
   posts Post[]
   

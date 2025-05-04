@@ -1,3 +1,5 @@
+import { z } from "astro:schema";
+
 export type ModelErrorMessages = Record<string, string>;
 
 class IncludingMessagesError extends Error {
@@ -11,6 +13,30 @@ class IncludingMessagesError extends Error {
 
 // Exceptions representing request error
 export class ValidationError extends IncludingMessagesError {
+  constructor(modelErrorMessages: ModelErrorMessages);
+  constructor(zodError: z.ZodError);
+  constructor(arg: ModelErrorMessages | z.ZodError) {
+    if (arg instanceof z.ZodError) {
+      const errorMessages: ModelErrorMessages = { };
+      for (const issue of arg.issues) {
+        console.log(issue);
+        const path = issue.path.map((element, index, issues) => {
+          const formattedElement = typeof element === "number" ? `[${element}]` : element;
+          if (index < issues.length - 1) {
+            return formattedElement + ".";
+          }
+
+          return formattedElement;
+        }).join("");
+
+        errorMessages[path] = issue.message;
+      }
+
+      super(errorMessages);
+    } else {
+      super(arg);
+    }
+  }
 }
 
 export class DuplicatedError extends IncludingMessagesError {

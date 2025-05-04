@@ -1,0 +1,115 @@
+---
+import { createSignInModel } from "@/models/signInModels";
+import { generateTokenAsync } from "@/services/authenticationService";
+import { ValidationError, OperationError } from "@/errors";
+import { joinHTMLClass } from "@/utils/htmlClassUtils";
+
+// Layout component.
+import RootLayout from "@/layouts/RootLayout.astro";
+
+// Form components.
+import ValidationMessage from "@/components/form/ValidationMessage.astro";
+
+const model = createSignInModel();
+
+if (Astro.request.method.toLowerCase() === "post") {
+  try {
+    const formData = await Astro.request.formData();
+    model.parseFromForm(formData);
+    const token = await generateTokenAsync(model.toRequestDto());
+    Astro.cookies.set("Authorization", `Bearer ${token}`);
+    Astro.redirect("/");
+  } catch (error) {
+    if (error instanceof ValidationError || error instanceof OperationError) {
+      Astro.locals.modelErrorMessagesStore.setErrorMessages(error.errorMessages);
+    } else {
+      throw error;
+    }
+  }
+}
+---
+
+<RootLayout pageTitle="Đăng nhập">
+  <div class="container-fluid flex-fill">
+    <div class="row w-100 justify-content-center align-items-center">
+      <div class="col col-sm-auto col-12 p-0 m-sm-4 m-0 rounded-4 shadow form-container">
+        <!-- Header -->
+        <div class="d-flex justify-content-center align-items-center p-4 pb-2">
+          <div class="logo-container">
+            <img
+              src="/images/main-logo-transparent-white.png"
+              alt={Astro.locals.generalSettings.applicationName}
+              class="logo w-100 h-100"
+            />
+          </div>
+        </div>
+
+        <!-- Form -->
+        <form id="signInForm" method="post" class="bg-white p-3 w-100">
+          {/* UserName */}
+          <div class="form-group mb-3">
+            <div class="form-floating">
+              <input
+                name="userName"
+                id="userName"
+                type="text"
+                class={joinHTMLClass(
+                  "form-control",
+                  Astro.locals.modelErrorMessagesStore.getInputClass("userName")
+                )}
+                placeholder=""
+              />
+              <label for="userName" class="form-label">Tên tài khoản</label>
+            </div>
+            <ValidationMessage name="userName" />
+          </div>
+
+          {/* Password */}
+          <div class="form-group mb-3">
+            <div class="form-floating">
+              <input
+                name="password"
+                id="password"
+                type="password"
+                class={joinHTMLClass(
+                  "form-control",
+                  Astro.locals.modelErrorMessagesStore.getInputClass("password")
+                )}
+                placeholder=""
+              />
+              <label for="password" class="form-label">Mật khẩu</label>
+            </div>
+            <ValidationMessage name="password" />
+          </div>
+
+          {/* SubmitButton */}
+          <button type="submit" class="btn btn-success">
+            Đăng nhập
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</RootLayout>
+
+<style>
+  body {
+    background: rgba(0, 0, 0, 0.1);
+    height: fit-content;
+    min-height: 100%;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+  }
+
+  .container {
+    background: white;
+    width: 100%;
+    max-width: 1200px;
+    border-left: 1px solid rgba(0, 0, 0, 0.25);
+    border-right: 1px solid rgba(0, 0, 0, 0.25);
+    min-height: 100vh;
+  }
+</style>

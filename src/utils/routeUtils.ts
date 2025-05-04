@@ -19,6 +19,9 @@ export const getPublicContactsRoutePath = () => "/lien-he";
 export const getPublicEnquiryRoutePath = () => "/cau-hoi";
 
 export const getSignInRoutePath = () => "/dang-nhap";
+export const getSignOutRoutePath = () => "/dang-xuat";
+
+export const getProtectedRoutePath = () => "/quan-tri";
 export const getProtectedDashboardRoutePath = () => "/quan-tri/bang-dieu-khien";
 export const getProtectedContentRoutePath = () => "/quan-tri/noi-dung";
 export const getProtectedSliderItemCreateRoutePath = () => {

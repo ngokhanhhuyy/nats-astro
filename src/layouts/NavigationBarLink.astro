@@ -1,0 +1,23 @@
+---
+import { compute } from "@/utils/computeUtils";
+
+type Props = {
+  href: string;
+}
+
+const props = Astro.props;
+
+// Computed.
+const computedClassName = compute<string | undefined>(() => {
+  if (Astro.url.pathname.startsWith(props.href)) {
+    return "active";
+  }
+
+  return undefined;
+});
+---
+
+
+<a href={props.href} class={computedClassName} class="nav-link">
+  <slot></slot>
+</a>
