@@ -1,11 +1,21 @@
+import type { Member } from "@prisma/client";
+
 declare global {
-	type MemberResponseDto = {
-		id: number;
-		fullName: string;
-		roleName: string;
-		description: string;
-		thumbnailUrl: string | null;
-	};
+  type MemberDetailResponseDto = {
+    id: number;
+    fullName: string;
+    roleName: string;
+    thumbnailUrl: string | null;
+    description: string;
+  };
 }
 
-export { };
+export function createMemberDetailResponseDto(member: Member): MemberDetailResponseDto {
+  return {
+    id: member.id,
+    fullName: member.fullName,
+    roleName: member.roleName,
+    thumbnailUrl: member.thumbnailUrl,
+    description: member.description
+  }
+}

@@ -1,7 +1,18 @@
 import { PrismaClient } from "@prisma/client";
-import { generateToken, verifyToken } from "@/utils/jwtUtils";
 import { verifyPasswordAsync } from "@/utils/passwordUtils";
 import { OperationError } from "@/errors";
+import jwt, { type Secret, type SignOptions } from "jsonwebtoken";
+
+type Payload = {
+  iss: string;
+  sub: string;
+  exp: number;
+  iat: number;
+  aud: string;
+  user: UserDetailResponseDto
+};
+
+const secretKey = import.meta.env.SECRET_KEY as Secret;
 
 const service = {
   /**
@@ -26,6 +37,7 @@ const service = {
    * - When the specified password is incorrect.
    */
   async generateTokenAsync(requestDto: SignInRequestDto): Promise<string> {
+    // Fetch the entity from the database.
     const prisma = new PrismaClient();
     const user = await prisma.user.findFirst({
       where: {
@@ -36,24 +48,47 @@ const service = {
       }
     });
   
+    // Ensure the user exists.
     if (!user) {
       throw new OperationError({ userName: "User doesn't exist." });
     }
   
+    // Ensure the user's password is correct
     if (!verifyPasswordAsync(requestDto.password, user.passwordHash)) {
       throw new OperationError({ password: "Password is incorrect." });
     }
+    
+    // Generate the token.
+    const currentSeconds = new Date().getTime() / 1000;
+    const payload: Payload = {
+      iss: "nats",
+      sub: user.id.toString(),
+      exp: currentSeconds + (30 * 24) * 60 * 60 * 7,
+      iat: currentSeconds,
+      aud: `${user.userName}#${user.id}`,
+      user: {
+        id: user.id,
+        userName: user.userName,
+        canCreateUser: user.permission?.canCreateUser ?? false,
+        canResetUserPassword: user.permission?.canResetUserPassword ?? false,
+        canDeleteUser: user.permission?.canDeleteUser ?? false
+      }
+    };
   
-    return generateToken({
-      id: user.id,
-      userName: user.userName,
-      canCreateUser: user.permission?.canCreateUser ?? false,
-      canResetUserPassword: user.permission?.canResetUserPassword ?? false,
-      canDeleteUser: user.permission?.canDeleteUser ?? false
-    }, 30 * 24);
+    return jwt.sign(payload, secretKey);
+  },
+
+  /**
+   * Verifies if the given token is valid and extracts the user data from the token.
+   * 
+   * @param token The token retrieved from the client's request cookie.
+   * @returns A DTO containing the data of the user extracted from the token.
+   */
+  verifyToken(token: string): UserDetailResponseDto {
+    const payload = jwt.verify(token, secretKey) as Payload;
+    return payload.user;
   }
 }
-
 
 export function useAuthenticationService() {
   return service;

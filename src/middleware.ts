@@ -1,26 +1,28 @@
 import { defineMiddleware } from "astro:middleware";
-import { getGeneralSettingsAsync } from "./services/generalSettingsService";
+import { useAuthenticationService } from "./services/authenticationService";
+import { useGeneralSettingsService } from "./services/generalSettingsService";
 import { createUserDetailModel } from "@/models/userModels";
 import { createGeneralSettingsDetailModel } from "@/models/generalSettingsModels";
 import { createModelErrorMessagesStore } from "./utils/modelErrorUtils";
-import { verifyToken } from "./utils/jwtUtils";
 import { useRouteUtils } from "./utils/routeUtils";
 
+const authenticationService = useAuthenticationService();
+const generalSettingsService = useGeneralSettingsService();
 const routeUtils = useRouteUtils();
 
 export const onRequest = defineMiddleware(async (context, next) => {
-  // await generateAsync();
   context.locals.modelErrorMessagesStore = createModelErrorMessagesStore();
   context.locals.caller = null;
   context.locals.generalSettings = createGeneralSettingsDetailModel(
-    await getGeneralSettingsAsync());
+    await generalSettingsService.getAsync());
 
   // Verify jwt token.
   const token = context.cookies.get("Authorization");
   if (token) {
     try {
-      const payload = verifyToken(token.value.replace(/^Bearer\s/, ""));
-      context.locals.caller = createUserDetailModel(payload.user);
+      const userResponseDto = authenticationService
+        .verifyToken(token.value.replace(/^Bearer\s/, ""));
+      context.locals.caller = createUserDetailModel(userResponseDto);
     } catch (error) {
       context.cookies.delete("Authorization");
     }

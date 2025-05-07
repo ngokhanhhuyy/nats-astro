@@ -1,22 +1,30 @@
 ---
 import { createSignInModel } from "@/models/signInModels";
-import { generateTokenAsync } from "@/services/authenticationService";
+import { useAuthenticationService } from "@/services/authenticationService";
+import { useDisplayNames } from "@/localization/displayNames";
 import { ValidationError, OperationError } from "@/errors";
-import { joinHTMLClass } from "@/utils/htmlUtils";
+import { useHTMLUtils } from "@/utils/htmlUtils";
 
 // Layout component.
 import RootLayout from "@/layouts/RootLayout.astro";
 
-// Form components.
-import ValidationMessage from "@/components/form/ValidationMessage.astro";
+// Form component.
+import Field from "@/components/form/Field.astro";
+import TextInput from "@/components/form/TextInput.astro";
 
+// Dependencies.
+const authenticationService = useAuthenticationService();
+const { joinHTMLClass } = useHTMLUtils();
+const displayNames = useDisplayNames();
+
+// Model.
 const model = createSignInModel();
 
 if (Astro.request.method.toLowerCase() === "post") {
   try {
     const formData = await Astro.request.formData();
     model.parseFromForm(formData);
-    const token = await generateTokenAsync(model.toRequestDto());
+    const token = await authenticationService.generateTokenAsync(model.toRequestDto());
     Astro.cookies.set("Authorization", `Bearer ${token}`);
     return Astro.redirect("/");
   } catch (error) {
@@ -45,42 +53,16 @@ if (Astro.request.method.toLowerCase() === "post") {
         </div>
 
         <!-- Form -->
-        <form id="signInForm" method="post" class="bg-white p-3 w-100">
+        <form method="post" class="bg-white p-3 w-100">
           {/* UserName */}
-          <div class="form-group mb-3">
-            <div class="form-floating">
-              <input
-                name="userName"
-                id="userName"
-                type="text"
-                class={joinHTMLClass(
-                  "form-control",
-                  Astro.locals.modelErrorMessagesStore.getInputClass("userName")
-                )}
-                placeholder=""
-              />
-              <label for="userName" class="form-label">Tên tài khoản</label>
-            </div>
-            <ValidationMessage name="userName" />
-          </div>
+          <Field name="userName" displayName={displayNames.userName} floating>
+            <TextInput name="userName" value={model.userName} />
+          </Field>
 
           {/* Password */}
-          <div class="form-group mb-3">
-            <div class="form-floating">
-              <input
-                name="password"
-                id="password"
-                type="password"
-                class={joinHTMLClass(
-                  "form-control",
-                  Astro.locals.modelErrorMessagesStore.getInputClass("password")
-                )}
-                placeholder=""
-              />
-              <label for="password" class="form-label">Mật khẩu</label>
-            </div>
-            <ValidationMessage name="password" />
-          </div>
+          <Field name="password" displayName={displayNames.password} floating>
+            <TextInput name="password" type="password" />
+          </Field>
 
           {/* SubmitButton */}
           <button type="submit" class="btn btn-success">
