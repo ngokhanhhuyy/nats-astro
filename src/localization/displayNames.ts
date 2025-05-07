@@ -1,98 +1,103 @@
+const displayNames = {
+    user: "Người dùng",
+  role: "Vị trí",
+  photo: "Hình ảnh",
+  home: "Trang chủ",
+  dashboard: "Bảng điều khiển",
+  generalSettings: "Cài đặt chung",
+  education: "Đào tạo",
+  product: "Sản phẩm",
+  service: "Dịch vụ",
+  enquiry: "Câu hỏi",
+  id: "Mã số",
+  name: "Tên",
+  account: "Tài khoản",
+  profile: "Hồ sơ",
+  userName: "Tên đăng nhập",
+  password: "Mật khẩu",
+  currentPassword: "Mật khẩu hiện tại",
+  newPassword: "Mật khẩu mới",
+  confirmationPassword: "Xác nhận mật khẩu",
+  fullName: "Tên đầy đủ",
+  roleName: "Chức vụ",
+  description: "Mô tả",
+  quantity: "Số lượng",
+  startingAt: "Bắt đầu vào lúc",
+  endingAt: "Kết thúc vào lúc",
+  category: "Phân loại",
+  normalizedTitle: "Tiêu đề không dấu",
+  title: "Tiêu đề",
+  status: "Tình trạng",
+  groupName: "Tên nhóm",
+  orderByField: "Trường sắp xếp",
+  orderByAscending: "Thứ tự sắp xếp",
+  searchByField: "Trường tìm kiếm",
+  searchByContent: "Nội dung tìm kiếm",
+  page: "Trang",
+  resultsPerPage: "Kết quả mỗi trang",
+  pageCount: "Số trang",
+  resultsCount: "Số kết quả",
+  results: "Kết quả",
+  thumbnail: "Ảnh xem trước",
+  thumbnailFile: "File ảnh xem trước",
+  operation: "Thao tác",
+  mainPhoto: "Ảnh chính",
+  mainQuote: "Trích dẫn",
+  aboutUs: "Về chúng tôi",
+  whyChooseUs: "Vì sao chọn chúng tôi",
+  ourDifference: "Sự khác biệt của chúng tôi",
+  ourCulture: "Văn hoá của chúng tôi",
+  members: "Đội ngũ",
+  certificates: "Chứng chỉ",
+  applicationName: "Tên trang web",
+  applicationShortName: "Tên trang web (viết tắt)",
+  favIcon: "Biểu tượng trang web",
+  underMaintainance: "Tình trạng bảo trì",
+  content: "Nội dung",
+  photoFile: "File ảnh",
+  course: "Khoá học",
+  summary: "Tóm tắt",
+  introduction: "Giới thiệu",
+  introductionItem: "Giới thiệu",
+  detail: "Chi tiết",
+  index: "Thứ tự",
+  sliderItem: "Trình chiếu ảnh",
+  summaryItem: "Giới thiệu",
+  post: "Bài viết",
+  postCategory: "Chuyên mục bài viết",
+  createdDateTime: "Tạo vào lúc",
+  updatedDateTime: "Sửa vào lúc",
+  views: "Lượt xem",
+  isPinned: "Được ghim",
+  isPublished: "Được xuất bản",
+  statistics: "Thống kê",
+  totalCategories: "Chuyên mục",
+  totalPostCount: "Bài viết",
+  totalPostViews: "Lượt xem",
+  unpublishedPostCount: "Chưa xuất bản",
+  phoneNumber: "Số điện thoại",
+  zalo: "Zalo",
+  zaloNumber: "Số zalo",
+  email: "Địa chỉ email",
+  address: "Địa chỉ",
+  receivedDateTime: "Ngày nhận",
+  isCompleted: "Đã hoàn thành",
+  contact: "Thông tin liên hệ",
+  workingHours: "Giờ làm việc",
+  recordedDateTime: "Ghi nhận lúc",
+  accessCount: "Lượt truy cập",
+  guestCount: "Khách truy cập",
+  type: "Phân loại",
+  periodOfDayName: "Khung giờ",
+  trafficByDate: "Truy cập theo ngày",
+  trafficByHour: "Truy cập theo giờ",
+  trafficByHourRange: "Truy cập theo khung giờ",
+  trafficByDevice: "Truy cập theo thiết bị",
+  todayAccessCount: "Lượt truy cập hôm nay",
+  todayGuestCount: "Khách truy cập hôm nay",
+  incompletedEnquiryCount: "Câu hỏi chưa giải đáp",
+};
 
-export const User = "Người dùng";
-export const Role = "Vị trí";
-export const Photo = "Hình ảnh";
-export const Home = "Trang chủ";
-export const Dashboard = "Bảng điều khiển";
-export const GeneralSettings = "Cài đặt chung";
-export const Education = "Đào tạo";
-export const Product = "Sản phẩm";
-export const Service = "Dịch vụ";
-export const Enquiry = "Câu hỏi";
-export const Id = "Mã số";
-export const Name = "Tên";
-export const Account = "Tài khoản";
-export const Profile = "Hồ sơ";
-export const UserName = "Tên đăng nhập";
-export const Password = "Mật khẩu";
-export const CurrentPassword = "Mật khẩu hiện tại";
-export const NewPassword = "Mật khẩu mới";
-export const ConfirmationPassword = "Xác nhận mật khẩu";
-export const FullName = "Tên đầy đủ";
-export const RoleName = "Chức vụ";
-export const Description = "Mô tả";
-export const Quantity = "Số lượng";
-export const StartingAt = "Bắt đầu vào lúc";
-export const EndingAt = "Kết thúc vào lúc";
-export const Category = "Phân loại";
-export const NormalizedTitle = "Tiêu đề không dấu";
-export const Title = "Tiêu đề";
-export const Status = "Tình trạng";
-export const GroupName = "Tên nhóm";
-export const OrderByField = "Trường sắp xếp";
-export const OrderByAscending = "Thứ tự sắp xếp";
-export const SearchByField = "Trường tìm kiếm";
-export const SearchByContent = "Nội dung tìm kiếm";
-export const Page = "Trang";
-export const ResultsPerPage = "Kết quả mỗi trang";
-export const PageCount = "Số trang";
-export const ResultsCount = "Số kết quả";
-export const Results = "Kết quả";
-export const Thumbnail = "Ảnh xem trước";
-export const ThumbnailFile = "File ảnh xem trước";
-export const Operation = "Thao tác";
-export const MainPhoto = "Ảnh chính";
-export const MessageFromUs = "Thông điệp";
-export const AboutUs = "Về chúng tôi";
-export const WhyChooseUs = "Vì sao chọn chúng tôi";
-export const OurDifference = "Sự khác biệt của chúng tôi";
-export const OurCulture = "Văn hoá của chúng tôi";
-export const Members = "Đội ngũ";
-export const Certificates = "Chứng chỉ";
-export const ApplicationName = "Tên trang web";
-export const ApplicationShortName = "Tên trang web (viết tắt)";
-export const FavIcon = "Biểu tượng trang web";
-export const UnderMaintainance = "Tình trạng bảo trì";
-export const Content = "Nội dung";
-export const PhotoFile = "File ảnh";
-export const Course = "Khoá học";
-export const Summary = "Tóm tắt";
-export const Introduction = "Giới thiệu";
-export const IntroductionItem = "Giới thiệu";
-export const Detail = "Chi tiết";
-export const Index = "Thứ tự";
-export const SliderItem = "Trình chiếu ảnh";
-export const SummaryItem = "Giới thiệu";
-export const Post = "Bài viết";
-export const PostCategory = "Chuyên mục bài viết";
-export const CreatedDateTime = "Tạo vào lúc";
-export const UpdatedDateTime = "Sửa vào lúc";
-export const Views = "Lượt xem";
-export const IsPinned = "Được ghim";
-export const IsPublished = "Được xuất bản";
-export const Statistics = "Thống kê";
-export const TotalCategories = "Chuyên mục";
-export const TotalPostCount = "Bài viết";
-export const TotalPostViews = "Lượt xem";
-export const UnpublishedPostCount = "Chưa xuất bản";
-export const PhoneNumber = "Số điện thoại";
-export const Zalo = "Zalo";
-export const ZaloNumber = "Số zalo";
-export const Email = "Địa chỉ email";
-export const Address = "Địa chỉ";
-export const ReceivedDateTime = "Ngày nhận";
-export const IsCompleted = "Đã hoàn thành";
-export const Contact = "Thông tin liên hệ";
-export const WorkingHours = "Giờ làm việc";
-export const RecordedDateTime = "Ghi nhận lúc";
-export const AccessCount = "Lượt truy cập";
-export const GuestCount = "Khách truy cập";
-export const Type = "Phân loại";
-export const PeriodOfDayName = "Khung giờ";
-export const TrafficByDate = "Truy cập theo ngày";
-export const TrafficByHour = "Truy cập theo giờ";
-export const TrafficByHourRange = "Truy cập theo khung giờ";
-export const TrafficByDevice = "Truy cập theo thiết bị";
-export const TodayAccessCount = "Lượt truy cập hôm nay";
-export const TodayGuestCount = "Khách truy cập hôm nay";
-export const IncompletedEnquiryCount = "Câu hỏi chưa giải đáp";
+export function useDisplayNames() {
+  return displayNames;
+}

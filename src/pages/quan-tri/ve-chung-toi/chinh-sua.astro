@@ -1,0 +1,115 @@
+---
+import { getAboutUsIntroductionAsync } from "@/services/aboutUsIntroductionService";
+import { updateAboutUsIntroductionAsync } from "@/services/aboutUsIntroductionService";
+import { createAboutUsIntroductionUpdateModel } from "@/models/aboutUsIntroductionModels";
+import { useDisplayNames } from "@/localization/displayNames";
+import { ValidationError } from "@/errors";
+
+// Layout components.
+import ProtectedLayout from "@/layouts/protected/ProtectedLayout.astro";
+import MainBlock from "@/layouts/protected/MainBlock.astro";
+
+// Form components.
+import Field from "@/components/form/Field.astro";
+import TextAreaInput from "@/components/form/TextAreaInput.astro";
+import ThumbnailInput from "@/components/form/ThumbnailInput.astro";
+
+// Dependencies.
+const displayNames = useDisplayNames();
+
+// Model and states.
+const responseDto = await getAboutUsIntroductionAsync();
+const model = createAboutUsIntroductionUpdateModel(responseDto);
+const pageTitle = "Chỉnh sửa nội dung về chúng tôi";
+
+if (Astro.request.method.toLowerCase() === "post") {
+  try {
+    model.parseFromForm(await Astro.request.formData());
+    const requestDto = model.toRequestDto();
+    await updateAboutUsIntroductionAsync(requestDto);
+    return Astro.redirect(model.detailRoutePath());
+  } catch (error) {
+    if (error instanceof ValidationError) {
+      console.log(error);
+      Astro.locals.modelErrorMessagesStore.setErrorMessages(error.errorMessages);
+    } else {
+      throw error;
+    }
+  }
+}
+---
+
+<ProtectedLayout pageTitle={pageTitle}>
+  <form method="post" class="row g-3">
+    <div class="col col-12">
+      <MainBlock title={pageTitle} bodyPadding={[2, 3, 3, 3]}>
+        {/* ThumbnailType */}
+        <input type="hidden" name="thumbnailType" value={model.thumbnailType} />
+
+        {/* ThumbnailUrl */}
+        <Field name="thumbnailUrl" displayName={displayNames.thumbnail} class="mb-3">
+          <ThumbnailInput name="thumbnailUrl" value={model.thumbnailUrl} />
+        </Field>
+
+        {/* MainQuoteContent */}
+        <Field name="mainQuoteContent" displayName={displayNames.mainQuote} class="mb-3">
+          <TextAreaInput
+            name="mainQuoteContent"
+            value={model.mainQuoteContent}
+            placeholder={`Nội dung ${displayNames.mainQuote.toLowerCase()}`}
+          />
+        </Field>
+  
+        {/* AboutUsContent */}
+        <Field name="aboutUsContent" displayName={displayNames.aboutUs} class="mb-3">
+          <TextAreaInput
+            name="aboutUsContent"
+            value={model.aboutUsContent}
+            placeholder={`Nội dung ${displayNames.aboutUs.toLowerCase()}`}
+            minHeight={300}
+          />
+        </Field>
+  
+        {/* WhyChooseUsContent */}
+        <Field name="whyChooseUsContent" displayName={displayNames.whyChooseUs} class="mb-3">
+          <TextAreaInput
+            name="whyChooseUsContent"
+            value={model.whyChooseUsContent}
+            placeholder={`Nội dung ${displayNames.whyChooseUs.toLowerCase()}`}
+            minHeight={300}
+          />
+        </Field>
+  
+        {/* AboutUsContent */}
+        <Field
+          name="ourDifferenceContent"
+          displayName={displayNames.ourDifference}
+          class="mb-3"
+        >
+          <TextAreaInput
+            name="ourDifferenceContent"
+            value={model.ourDifferenceContent}
+            placeholder={`Nội dung ${displayNames.ourDifference.toLowerCase()}`}
+            minHeight={300}
+          />
+        </Field>
+  
+        {/* AboutUsContent */}
+        <Field name="ourCultureContent" displayName={displayNames.ourCulture}>
+          <TextAreaInput
+            name="ourCultureContent"
+            value={model.ourCultureContent}
+            placeholder={`Nội dung ${displayNames.ourCulture.toLowerCase()}`}
+            minHeight={300}
+          />
+        </Field>
+      </MainBlock>
+    </div>
+    <div class="col col-12 d-flex justify-content-end">
+      <button type="submit" class="btn btn-success">
+        <i class="bi bi-floppy me-2"></i>
+        <span>Lưu</span>
+      </button>
+    </div>
+  </form>
+</ProtectedLayout>

@@ -16,7 +16,7 @@ function generateToken(responseDto: UserDetailResponseDto, expiresInHours: numbe
   const payload: Payload = {
     iss: "nats",
     sub: responseDto.id.toString(),
-    exp: currentSeconds + expiresInHours * 60 * 60,
+    exp: currentSeconds + expiresInHours * 60 * 60 * 7,
     iat: currentSeconds,
     aud: `${responseDto.userName}#${responseDto.id}`,
     user: responseDto

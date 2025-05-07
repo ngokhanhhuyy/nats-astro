@@ -4,7 +4,9 @@ import { createUserDetailModel } from "@/models/userModels";
 import { createGeneralSettingsDetailModel } from "@/models/generalSettingsModels";
 import { createModelErrorMessagesStore } from "./utils/modelErrorUtils";
 import { verifyToken } from "./utils/jwtUtils";
-import { getSignInRoutePath, getProtectedRoutePath } from "./utils/routeUtils";
+import { useRouteUtils } from "./utils/routeUtils";
+
+const routeUtils = useRouteUtils();
 
 export const onRequest = defineMiddleware(async (context, next) => {
   // await generateAsync();
@@ -16,13 +18,18 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // Verify jwt token.
   const token = context.cookies.get("Authorization");
   if (token) {
-    const payload = verifyToken(token.json());
-    context.locals.caller = createUserDetailModel(payload.user);
+    try {
+      const payload = verifyToken(token.value.replace(/^Bearer\s/, ""));
+      context.locals.caller = createUserDetailModel(payload.user);
+    } catch (error) {
+      context.cookies.delete("Authorization");
+    }
   }
 
   // Authorize admin route.
-  if (context.url.pathname.startsWith(getProtectedRoutePath()) && !context.locals.caller) {
-    return context.redirect(getSignInRoutePath());
+  const isProtectedRoute = context.url.pathname.startsWith(routeUtils.getProtectedRoutePath());
+  if (isProtectedRoute && !context.locals.caller) {
+    return context.redirect(routeUtils.getSignInRoutePath());
   }
 
   return next();

@@ -2,7 +2,7 @@
 import { createSignInModel } from "@/models/signInModels";
 import { generateTokenAsync } from "@/services/authenticationService";
 import { ValidationError, OperationError } from "@/errors";
-import { joinHTMLClass } from "@/utils/htmlClassUtils";
+import { joinHTMLClass } from "@/utils/htmlUtils";
 
 // Layout component.
 import RootLayout from "@/layouts/RootLayout.astro";
@@ -18,7 +18,7 @@ if (Astro.request.method.toLowerCase() === "post") {
     model.parseFromForm(formData);
     const token = await generateTokenAsync(model.toRequestDto());
     Astro.cookies.set("Authorization", `Bearer ${token}`);
-    Astro.redirect("/");
+    return Astro.redirect("/");
   } catch (error) {
     if (error instanceof ValidationError || error instanceof OperationError) {
       Astro.locals.modelErrorMessagesStore.setErrorMessages(error.errorMessages);

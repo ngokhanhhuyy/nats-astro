@@ -215,7 +215,7 @@ async function generateCatalogItemsAsync(transaction: PrismaTransactionalClient)
 }
 
 async function generateGeneralSettingsAsync(transaction: PrismaTransactionalClient) {
-  await prisma.generalSettings.create({
+  await transaction.generalSettings.create({
     data: {
       applicationName: "Trung tâm Khoa học Đào tạo và Thẩm mỹ Quốc Gia",
       applicationShortName: "NATS",

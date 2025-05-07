@@ -1,5 +1,5 @@
 export enum CatalogItemType {
-	Course,
-	Service,
-	Product
+  Course = "khoa_hoc",
+  Service = "dich_vu",
+  Product = "san_pham",
 }

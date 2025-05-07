@@ -10,7 +10,7 @@ generator client {
 model SliderItem {
   id           Int     @id @default(autoincrement())
   title        String? @db.VarChar(100)
-  thumbnailUrl String? @map("thumbnail_url") @db.VarChar(255)
+  thumbnailUrl String  @map("thumbnail_url") @db.VarChar(255)
   index        Int     @default(0)
 
   @@map("slider_items")
@@ -30,7 +30,7 @@ model AboutUsIntroduction {
   id                   Int           @id @default(autoincrement())
   thumbnailUrl         String?       @map("thumbnail_url") @db.VarChar(1000)
   thumbnailType        ThumbnailType @default(Photo) @map("thumbnail_type")
-  mainQuoteContent     String        @map("main_quote_content") @db.VarChar(1000)
+  mainQuoteContent     String?       @map("main_quote_content") @db.VarChar(1000)
   aboutUsContent       String        @map("about_us_content") @db.VarChar(1500)
   whyChooseUsContent   String        @map("why_choose_us") @db.VarChar(1500)
   ourDifferenceContent String        @map("our_difference_content") @db.VarChar(1500)
@@ -53,6 +53,7 @@ model Certificate {
   id           Int     @id @default(autoincrement())
   name         String? @db.VarChar(100)
   thumbnailUrl String  @map("thumbnail_url") @db.VarChar(255)
+
   @@map("certificates")
 }
 
@@ -76,81 +77,83 @@ model Contact {
 }
 
 model Enquiry {
-  int Int @id @default(autoincrement())
-  fullName String @db.VarChar(50) @map("full_name")
-  email String? @db.VarChar(255)
-  phoneNumber String @db.VarChar(15) @map("phone_number")
-  content String @db.VarChar(1000)
+  int              Int      @id @default(autoincrement())
+  fullName         String   @map("full_name") @db.VarChar(50)
+  email            String?  @db.VarChar(255)
+  phoneNumber      String   @map("phone_number") @db.VarChar(15)
+  content          String   @db.VarChar(1000)
   receivedDateTime DateTime @default(now()) @map("received_datetime")
-  isCompleted Boolean @default(false) @map("is_completed")
+  isCompleted      Boolean  @default(false) @map("is_completed")
 
   @@map("enquiries")
 }
 
 model GeneralSettings {
-  id Int @id @default(autoincrement())
-  applicationName String @db.VarChar(100) @map("application_name")
-  applicationShortName String @db.VarChar(15) @map("application_short_name")
-  isUnderMaintainance Boolean @default(false) @map("is_under_maintainance")
+  id                   Int     @id @default(autoincrement())
+  applicationName      String  @map("application_name") @db.VarChar(100)
+  applicationShortName String  @map("application_short_name") @db.VarChar(15)
+  isUnderMaintainance  Boolean @default(false) @map("is_under_maintainance")
 
   @@map("general_settings")
 }
 
 model Post {
-  id Int @id @default(autoincrement())
-  title String @db.VarChar(150)
-  uniqueTitle String @db.VarChar(255) @unique @map("unique_title")
-  thumbnailUrl String? @db.VarChar(255) @map("thumbnail_url")
-  content String @db.LongText
-  createdDateTime DateTime @default(now()) @map("created_datetime")
+  id              Int       @id @default(autoincrement())
+  title           String    @db.VarChar(150)
+  uniqueTitle     String    @map("unique_title") @db.VarChar(255)
+  thumbnailUrl    String?   @map("thumbnail_url") @db.VarChar(255)
+  content         String    @db.LongText
+  createdDateTime DateTime  @default(now()) @map("created_datetime")
   updatedDateTime DateTime? @map("updated_datetime")
-  isPinned Boolean @default(false) @map("is_pinned")
-  isPublished Boolean @default(false) @map("is_published")
-  views Int @default(0)
-  authorId Int @map("author_id")
-  author User @relation(fields: [authorId], references: [id])
-  
+  isPinned        Boolean   @default(false) @map("is_pinned")
+  isPublished     Boolean   @default(false) @map("is_published")
+  views           Int       @default(0)
+  authorId        Int       @map("author_id")
+  author          User      @relation(fields: [authorId], references: [id], map: "fk_posts_users_authorId")
+
+  @@unique([title], map: "unique_post_title")
   @@map("posts")
 }
 
 model TrafficByHour {
-  id Int @id @default(autoincrement())
-  recordedDateTime DateTime @default(now()) @map("recorded_datetime")
-  accessCount Int @default(0) @map("access_count")
-  guestCount Int @default(0) @map("guest_count")
-  trafficByDateId Int @map("traffic_by_date_id")
-  trafficByDate TrafficByDate @relation(fields: [trafficByDateId], references: [id])
+  id               Int           @id @default(autoincrement())
+  recordedDateTime DateTime      @default(now()) @map("recorded_datetime")
+  accessCount      Int           @default(0) @map("access_count")
+  guestCount       Int           @default(0) @map("guest_count")
+  trafficByDateId  Int           @map("traffic_by_date_id")
+  trafficByDate    TrafficByDate @relation(fields: [trafficByDateId], references: [id], map: "fk_trafficByHours_trafficByDates_trafficByDateId")
 
   @@map("traffic_by_hours")
 }
 
 model TrafficByDate {
-  id Int @id @default(autoincrement())
-  recordedDateTime DateTime @default(now()) @map("recorded_datetime")
-  accessCount Int @default(0) @map("access_count")
-  guestCount Int @default(0) @map("guest_count")
-  trafficByHours TrafficByHour[]
+  id               Int             @id @default(autoincrement())
+  recordedDateTime DateTime        @default(now()) @map("recorded_datetime")
+  accessCount      Int             @default(0) @map("access_count")
+  guestCount       Int             @default(0) @map("guest_count")
+  trafficByHours   TrafficByHour[]
 
   @@map("traffic_by_dates")
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  userName String @db.VarChar(50) @map("username") @unique
-  passwordHash String @db.VarChar(255) @map("password_hash")
-  permission UserPermission?
-  posts Post[]
-  
+  id           Int             @id @default(autoincrement())
+  userName     String          @map("username") @db.VarChar(50)
+  passwordHash String          @map("password_hash") @db.VarChar(255)
+  permission   UserPermission?
+  posts        Post[]
+
+  @@unique([userName], map: "unique_user_userName")
   @@map("users")
 }
 
 model UserPermission {
-  id Int @id @default(autoincrement())
-  canCreateUser Boolean @default(false) @map("can_create_user")
+  id                   Int     @id @default(autoincrement())
+  canCreateUser        Boolean @default(false) @map("can_create_user")
   canResetUserPassword Boolean @default(false) @map("can_reset_user_password")
-  canDeleteUser Boolean @default(false) @map("can_delete_user")
-  userId Int @unique
-  user User @relation(fields: [userId], references: [id])
+  canDeleteUser        Boolean @default(false) @map("can_delete_user")
+  userId               Int     @unique
+  user                 User    @relation(fields: [userId], references: [id], map: "fk_userPermissions_users_userId")
 
   @@map("user_permissions")
 }

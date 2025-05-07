@@ -71,3 +71,6 @@ export class ConnectionError extends Error {
 
 export class FileTooLargeError extends Error {
 }
+
+export { useErrorMessages } from "./errorMessages";
+export { usePrismaClientErrorHandler } from "./prismaErrorHandler";

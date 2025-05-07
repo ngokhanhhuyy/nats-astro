@@ -1,0 +1,34 @@
+---
+import { useSliderItemService } from "@/services/sliderItemService";
+import { createSliderItemUpsertModel } from "@/models/sliderItemModels";
+import { useRouteUtils } from "@/utils/routeUtils";
+import { ValidationError } from "@/errors";
+
+// Page component.
+import SliderItemUpsert from "@/components/routes/protected/SliderItemUpsert.astro";
+
+// Dependencies.
+const service = useSliderItemService();
+const routeUtils = useRouteUtils();
+
+// Model.
+const model = createSliderItemUpsertModel();
+
+// Request handling.
+if (Astro.request.method.toLowerCase() === "post") {
+  try {
+    model.parseFromForm(await Astro.request.formData());
+    const requestDto = model.toRequestDto();
+    await service.createAsync(requestDto);
+    return Astro.redirect(routeUtils.getProtectedSliderItemListRoutePath());
+  } catch (error) {
+    if (error instanceof ValidationError) {
+      Astro.locals.modelErrorMessagesStore.setErrorMessages(error.errorMessages);
+    } else {
+      throw error;
+    }
+  }
+}
+---
+
+<SliderItemUpsert model={model} isForCreating={true} />

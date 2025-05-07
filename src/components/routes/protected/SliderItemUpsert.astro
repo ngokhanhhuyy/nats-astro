@@ -1,0 +1,59 @@
+---
+import { useHTMLUtils } from "@/utils/htmlUtils";
+import { useDisplayNames } from "@/localization/displayNames";
+
+// Layout components.
+import ProtectedUpsertLayout from "@/layouts/protected/ProtectedUpsertLayout.astro";
+import MainBlock from "@/layouts/protected/MainBlock.astro";
+
+// Form components.
+import Field from "@/components/form/Field.astro";
+import TextInput from "@/components/form/TextInput.astro";
+import ThumbnailInput from "@/components/form/ThumbnailInput.astro";
+import SubmitButton from "@/components/form/SubmitButton.astro";
+
+// Props.
+type Props = { model: SliderItemUpsertModel; isForCreating: boolean };
+
+// Dependencies.
+const { compute } = useHTMLUtils();
+const { title: titleDisplayName, thumbnail: thumbnailDisplayName } = useDisplayNames();
+
+// Protected.
+const pageTitle = compute(() => {
+  if (Astro.props.isForCreating) {
+    return "Tạo ảnh trình chiếu mới";
+  }
+
+  return "Chỉnh sửa ảnh trình chiếu";
+});
+---
+
+<ProtectedUpsertLayout pageTitle={pageTitle}>
+  <form method="post" class="row g-3 justify-content-end">
+    <div class="col col-12">
+      <MainBlock title={pageTitle} bodyPadding={[2, 3, 3, 3]}>
+        {/* Title */}
+        <Field name="title" displayName={titleDisplayName} class="mb-3">
+          <TextInput
+            name="title"
+            value={Astro.props.model.title}
+            placeholder={titleDisplayName}
+          />
+        </Field>
+
+        {/* ThumbnailUrl */}
+        <Field name="thumbnailUrl" displayName={thumbnailDisplayName}>
+          <ThumbnailInput
+            name="thumbnailUrl"
+            value={Astro.props.model.thumbnailUrl}
+          />
+        </Field>
+      </MainBlock>
+    </div>
+
+    <div class="col col-auto">
+      <SubmitButton />
+    </div>
+  </form>
+</ProtectedUpsertLayout>

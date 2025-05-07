@@ -1,0 +1,96 @@
+---
+import { useSliderItemService } from "@/services/sliderItemService";
+import { createSliderItemDetailModel } from "@/models/sliderItemModels";
+import { useRouteUtils } from "@/utils/routeUtils";
+import { useHTMLUtils } from "@/utils/htmlUtils";
+
+// Layout components.
+import ProtectedLayout from "@/layouts/protected/ProtectedLayout.astro";
+import MainBlock from "@/layouts/protected/MainBlock.astro";
+
+// Dependencies.
+const service = useSliderItemService();
+const routeUtils = useRouteUtils();
+const { compute } = useHTMLUtils();
+
+// Model.
+const responseDtos = await service.getListAsync();
+const model = responseDtos.map((dto) => createSliderItemDetailModel(dto));
+
+// Computed.
+const createRoutePath = compute<string>(() => {
+  return routeUtils.getProtectedSliderItemCreateRoutePath();
+});
+---
+
+<ProtectedLayout pageTitle="Danh sách trình chiếu ảnh">
+  <div class="row g-3">
+    <div class="col col-12">
+      <MainBlock title="Danh sách trình chiếu ảnh">
+        <a href={createRoutePath} class="btn btn-success btn-sm" slot="header">
+          <i class="bi bi-plus-lg me-1"></i>
+          <span>Tạo mới</span>
+        </a>
+        <ul class="list-group list-group-flush" slot="body">
+          {model.map((sliderItem) => (
+            <li class="list-group-item d-flex">
+              {/* Thumbnail */}
+              <a href={sliderItem.updateRoutePath}>
+                <img
+                  src={sliderItem.thumbnailUrl}
+                  alt={`Ảnh ${sliderItem.id}`}
+                  class="img-thumbnail thumbnail"
+                />
+              </a>
+
+              {/* Name */}
+              <div class="d-flex flex-column flex-fill mx-2">
+                <a href={sliderItem.updateRoutePath} class="fw-bold">
+                  {sliderItem.title ?? `Ảnh #${sliderItem.id}`}
+                </a>
+
+                <span class="small opacity-50">Ảnh {sliderItem.id}</span>
+              </div>
+
+              {/* EditButton */}
+              <a
+                href={routeUtils.getProtectedSliderItemUpdateRoutePath(sliderItem.id)}
+                class="btn btn-outline-success btn-sm"
+              >
+                <i class="bi bi-pencil-square" />
+                <span class="ms-1 d-sm-inline d-none">Sửa</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </MainBlock>
+    </div>
+  </div>
+</ProtectedLayout>
+
+<style>
+  .list-group-item {
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+  }
+
+  .thumbnail {
+    width: 60px;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    transition:
+      border-color,
+      background-color 0.6s ease;
+  }
+
+  a:not(.btn) {
+    color: var(--bs-success);
+    text-decoration: none;
+  }
+
+  a:not(.btn):hover {
+    text-decoration: underline;
+  }
+</style>

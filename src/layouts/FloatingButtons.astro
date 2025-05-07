@@ -1,0 +1,34 @@
+<button id="scrollToTopButton" type="button" class="btn btn-success">
+  <i class="bi bi-chevron-up"></i>
+</button>
+
+<style>
+button {
+  position: fixed;
+  bottom: 0rem;
+  right: 0rem;
+  width: 3rem;
+  height: 3rem;
+  transform: translate(-100%, -200%);
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  box-shadow: var(--bs-box-shadow-sm);
+}
+
+@media (max-width: 576px) {
+  button {
+    transform: translate(-50%, -100%)
+  }
+}
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    document
+      .getElementById("scrollToTopButton")
+      ?.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+  });
+</script>

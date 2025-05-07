@@ -1,0 +1,30 @@
+---
+import type { JSX } from "astro/jsx-runtime";
+import { useHTMLUtils } from "@/utils/htmlUtils";
+
+// Props.
+type Props = { name: string; minHeight?: number } & Omit<JSX.TextareaHTMLAttributes, "type">;
+
+// Dependencies.
+const { compute } = useHTMLUtils();
+
+// Computed.
+const computedClass = compute<string>(() => {
+  const names = [
+    Astro.props.class,
+    "form-control"
+  ];
+
+  if (Astro.locals.modelErrorMessagesStore.hasError(Astro.props.name)) {
+    names.push(Astro.locals.modelErrorMessagesStore.getInputClass(Astro.props.name));
+  } 
+
+  return names.filter(name => name).join(" ");
+});
+---
+
+<textarea
+  {...Astro.props}
+  class={computedClass}
+  style={`min-height: ${Astro.props.minHeight ?? 200}px`}
+>{Astro.props.value}</textarea>

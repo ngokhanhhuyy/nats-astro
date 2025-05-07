@@ -1,7 +1,13 @@
 ---
-import { compute } from "@/utils/computeUtils";
-import * as routeUtils from "@/utils/routeUtils";
-import Link from "./NavigationBarLink.astro"
+import { useHTMLUtils } from "@/utils/htmlUtils";
+import { useRouteUtils } from "@/utils/routeUtils";
+
+// Child component.
+import Link from "./NavigationBarLink.astro";
+
+// Dependencies.
+const routeUtils = useRouteUtils();
+const { compute, joinHTMLClass } = useHTMLUtils();
 
 type RouteItem = {
   to: string;
@@ -14,134 +20,128 @@ const routeItems = compute<RouteItem[]>(() => {
     return [
       { to: routeUtils.getPublicHomeRoutePath(), text: "Trang chủ" },
       { to: routeUtils.getProtectedDashboardRoutePath(), text: "Bảng điều khiển" },
-      { to: routeUtils.getProtectedContentRoutePath(), text: "Nội dung" },
     ];
   }
 
   if (Astro.url.pathname.startsWith("/dang-nhap")) {
     return [];
   }
-  
+
   return [
-      { to: routeUtils.getPublicHomeRoutePath(), text: "Trang chủ" },
-      { to: routeUtils.getPublicSummaryItemsRoutePath(), text: "Giới thiệu" },
-      { to: routeUtils.getPublicAboutUsIntroductionRoutePath(), text: "Về chúng tôi" },
-      { to: routeUtils.getPublicServiceListRoutePath(), text: "Dịch vụ" },
-      { to: routeUtils.getPublicCourseListRoutePath(), text: "Khoá học" },
-      { to: routeUtils.getPublicContactsRoutePath(), text: "Liên hệ" }
-    ];
+    { to: routeUtils.getPublicHomeRoutePath(), text: "Trang chủ" },
+    { to: routeUtils.getPublicSummaryItemsRoutePath(), text: "Giới thiệu" },
+    { to: routeUtils.getPublicAboutUsIntroductionRoutePath(), text: "Về chúng tôi" },
+    { to: routeUtils.getPublicServiceListRoutePath(), text: "Dịch vụ" },
+    { to: routeUtils.getPublicCourseListRoutePath(), text: "Khoá học" },
+    { to: routeUtils.getPublicContactsRoutePath(), text: "Liên hệ" },
+  ];
 });
 
 const computedClass = compute<string | undefined>(() => {
   if (!Astro.url.pathname.startsWith("/quan-tri")) {
-    return "shadow";
+    return "navbar-expand-xl shadow";
   }
 
-  return "border-bottom border-success-subtle";
+  return "navbar-expand-md border-bottom border-success-subtle";
 });
 ---
 
 <nav
-  class={computedClass}
-  class="navbar navbar-expand-xl fixed-top fs-5"
+  class={joinHTMLClass(computedClass, "navbar fixed-top fs-5")}
   id="navbar"
   data-bs-theme="light"
 >
-  <div class="container-sm">
+  <div class="container-sm d-flex justify-content-between">
     <!-- Main logo -->
     <a
       href={routeUtils.getPublicHomeRoutePath()}
       class="navbar-brand d-flex align-items-center"
     >
       <img
-        src="/images/main-logo-transparent-white-without-text-small.png"
+        src="https://iili.io/3NX9xdN.png"
         alt={Astro.locals.generalSettings.applicationName}
         class="me-2 flex-shrink-0 logo"
       />
 
       <span class="fs-2 application-short-name">
-        { Astro.locals.generalSettings.applicationShortName }
+        {Astro.locals.generalSettings.applicationShortName}
       </span>
-    </RouterLink>
+    </a>
 
     <!-- NavigationButtonInSmallScreens -->
-    {Astro.url.pathname.startsWith(routeUtils.getSignInRoutePath()) && (
-      <button
-        class="navbar-toggler fs-3 me-2 py-2"
-        type="button"
-        data-bs-toggle="offcanvas"
-        data-bs-target="#navbar-content"
-        aria-controls="navbar-content"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <i class="bi bi-list"></i>
-      </button>
-    )}
-
-    <!-- Offcanvas -->
-    {Astro.url.pathname.startsWith(routeUtils.getSignInRoutePath()) && (
-      <div
-        class="offcanvas offcanvas-end"
-        tabindex="-1"
-        id="navbar-content"
-        aria-labelledby="offcanvasNavbarLabel"
-      >
-        <div class="offcanvas-header">
-          <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Điều hướng</h5>
+    {
+      !Astro.url.pathname.startsWith(routeUtils.getSignInRoutePath()) && (
+        <>
           <button
+            class="navbar-toggler fs-3 me-2"
             type="button"
-            class="btn-close"
-            data-bs-dismiss="offcanvas"
-            aria-label="Close"
-          ></button>
-        </div>
-  
-        <div class="offcanvas-body">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0 justify-content-end w-100">
-            {routeItems.map((item) => (
-              <li class="nav-item">
-                <Link href={item.to}>
-                  {item.text}
-                </Link>
-              </li>
-            ))}
-  
-            {isAdminRoute && (
-              <li class="nav-item">
-                {/* <SignOutLink /> */}
-                <form action={routeUtils.getSignOutRoutePath()} method="POST">
-                  <button type="submit" class="nav-link" id="signOutLink">
-                    Đăng xuất
-                  </button>
-                </form>
-              </li>
-            )}
-          </ul>
-        </div>
-      </div>
-    )}
+            data-bs-toggle="offcanvas"
+            data-bs-target="#navbar-content"
+            aria-controls="navbar-content"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <i class="bi bi-list" />
+          </button>
+
+          <div
+            class="offcanvas offcanvas-end"
+            tabindex="-1"
+            id="navbar-content"
+            aria-labelledby="offcanvasNavbarLabel"
+          >
+            <div class="offcanvas-header">
+              <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+                Điều hướng
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="offcanvas"
+                aria-label="Close"
+              />
+            </div>
+
+            <div class="offcanvas-body">
+              <ul class="navbar-nav me-auto justify-content-end w-100">
+                {routeItems.map((item) => (
+                  <li class="nav-item">
+                    <Link href={item.to}>{item.text}</Link>
+                  </li>
+                ))}
+
+                {isAdminRoute && (
+                  <li class="nav-item">
+                    {/* <SignOutLink /> */}
+                    <form action={routeUtils.getSignOutRoutePath()} method="POST">
+                      <button type="submit" class="nav-link" id="signOutLink">
+                        Đăng xuất
+                      </button>
+                    </form>
+                  </li>
+                )}
+              </ul>
+            </div>
+          </div>
+        </>
+      )
+    }
   </div>
 </nav>
 
 <style>
   nav {
     --bs-navbar-padding-y: 0 !important;
-    --navbar-logo-img-filter:
-      brightness(0)
-      saturate(100%)
-      invert(39%)
-      sepia(90%)
-      saturate(393%)
-      hue-rotate(100deg)
-      brightness(88%)
-      contrast(89%);
+    --navbar-logo-img-filter: brightness(0) saturate(100%) invert(39%) sepia(90%)
+      saturate(393%) hue-rotate(100deg) brightness(88%) contrast(89%);
     --navbar-transition-duration: 0.3s;
     --navbar-background-color: var(--bs-white);
     --navbar-foreground-color: var(--bs-success);
     background: var(--navbar-background-color);
     height: var(--navbar-height);
     transition: background-color var(--navbar-transition-duration) ease;
+    display: flex;
+    align-items: center;
   }
 
   :global(body[data-bs-padding-right] nav) {
@@ -166,7 +166,7 @@ const computedClass = compute<string | undefined>(() => {
 
   .navbar-toggler {
     color: var(--navbar-foreground-color) !important;
-    border-color: var(--navbar-foreground-color) !important;
+    border-color: rgba(var(--bs-success-rgb), 0.5) !important;
     transition: var(--navbar-transition-duration) ease !important;
   }
 
@@ -175,28 +175,36 @@ const computedClass = compute<string | undefined>(() => {
     color: var(--navbar-background-color) !important;
   }
 
-  :deep(.navbar-nav) {
+  .navbar-nav {
     --bs-nav-link-color: var(--navbar-foreground-color) !important;
     --bs-nav-link-hover-color: var(--navbar-foreground-color) !important;
+    --bs-nav-link-padding-y: 3px !important;
+    --bs-nav-link-padding-x: 5px !important;
     --bs-navbar-active-color: var(--navbar-foreground-color) !important;
+    font-size: 1rem;
   }
 
-  :deep(.nav-link) {
+  :global(.nav-link) {
     --bs-nav-link-color: var(--navbar-foreground-color) !important;
     --bs-nav-link-hover-color: var(--navbar-foreground-color) !important;
-    --bs-navbar-active-color: var(--navbar-foreground-color) !important;
-    font-size: .8em;
-    margin-right: .75em;
+    --bs-navbar-active-color: var(--bs-white) !important;
+    font-size: 0.8rem;
+    margin-right: 0.75em;
     padding: 3px 10px;
     border-radius: 8px;
   }
 
-  :deep(.nav-link.active) {
-    background-color: var(--bs-success) !important;
-    color: var(--bs-white);
+  .offcanvas.show,
+  .offcanvas.showing,
+  .offcanvas.hiding {
+    max-width: 300px;
   }
 
-  .offcanvas.show, .offcanvas.showing,   .offcanvas.hiding {
-    max-width: 300px;
+  @media (max-width: 992px) {
+    .offcanvas-body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 </style>

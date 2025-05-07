@@ -1,9 +1,8 @@
 declare global {
-	type SliderItemUpsertRequestDto = {
-		title: string | null;
-		thumbnailFile: string | null;
-		thumbnailChanged: boolean;
-	};
+  type SliderItemUpsertRequestDto = {
+    title: string | null;
+    thumbnailUrl: string;
+  };
 }
 
 export { };

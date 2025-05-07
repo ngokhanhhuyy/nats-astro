@@ -1,0 +1,45 @@
+---
+import { useSliderItemService } from "@/services/sliderItemService";
+import { createSliderItemUpsertModel } from "@/models/sliderItemModels";
+import { useRouteUtils } from "@/utils/routeUtils";
+import { ValidationError, NotFoundError } from "@/errors";
+
+// Page component.
+import SliderItemUpsert from "@/components/routes/protected/SliderItemUpsert.astro";
+
+// Dependencies.
+const service = useSliderItemService();
+const routeUtils = useRouteUtils();
+
+// Model.
+const model: SliderItemUpsertModel = createSliderItemUpsertModel();
+const id = parseInt(Astro.params.id ?? "");
+if (isNaN(id)) {
+  throw new NotFoundError();
+}
+
+// Request handling.
+try {
+  if (Astro.request.method.toLowerCase() === "get") {
+    const responseDto = await service.getSingleAsync(id);
+    model.mapFromResponseDto(responseDto);
+  } else if (Astro.request.method.toLowerCase() === "post") {
+    model.parseFromForm(await Astro.request.formData());
+    const requestDto = model.toRequestDto();
+    await service.updateAsync(id, requestDto);
+    return Astro.redirect(routeUtils.getProtectedSliderItemListRoutePath());
+  }
+} catch (error) {
+  if (error instanceof NotFoundError) {
+    return Astro.redirect(routeUtils.getProtectedSliderItemListRoutePath());
+  }
+
+  if (error instanceof ValidationError) {
+    Astro.locals.modelErrorMessagesStore.setErrorMessages(error.errorMessages);
+  } else {
+    throw error;
+  }
+}
+---
+
+<SliderItemUpsert model={model} isForCreating={false} />

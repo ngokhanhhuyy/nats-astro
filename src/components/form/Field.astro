@@ -1,38 +1,50 @@
 ---
 import type { JSX } from "astro/jsx-runtime";
-import { compute } from "@/utils/computeUtils";
+import { useHTMLUtils } from "@/utils/htmlUtils";
 
 // Props.
 type Props = {
   name: string;
   displayName: string;
-  floating: boolean;
+  floating?: boolean;
 } & JSX.HTMLAttributes;
 const props = Astro.props;
 
-// Computed.
-const computedClass = compute<string>(() => {
-  const names = [
-    "form-control",
-    props.floating &&"form-floating",
-    Astro.locals.modelErrorMessagesStore.getInputClass(props.name),
-  ]
-  return names.filter((n) => n).join(" ");
-});
+// Dependencies.
+const { compute, joinHTMLClass } = useHTMLUtils();
 
-const hasError = compute<boolean>(() => {
-  return Astro.locals.modelErrorMessagesStore.hasError(props.name);
+// Computed.
+const validationMessageClass = compute<string>(() => {
+  if (Astro.locals.modelErrorMessagesStore.hasError(props.name)) {
+    return "text-danger";
+  };
+
+  return "text-success";
 });
 ---
 
-<div {...props} class={computedClass}>
-  {!props.floating && <label class="form-label fw-bold small">{props.displayName}</label>}
-  <slot></slot>
-  {props.floating && <label class="form-label fw-bold small">{props.displayName}</label>}
+<div {...props} class={joinHTMLClass(props.class, "form-group")}>
+  {props.floating ? (
+    <div class="form-floating">
+      <slot />
+      <label class="form-label fw-bold small">{props.displayName}</label>
+    </div>
+  ) : (
+    <label class="form-label fw-bold small m-0 regular-label">{props.displayName}</label>
+    <slot />
+  )}
   
-  {hasError && (
-    <span class="text-danger">
+  {Astro.locals.modelErrorMessagesStore.hasError(Astro.props.name) && (
+    <span class={validationMessageClass}>
       {Astro.locals.modelErrorMessagesStore.getMessage(props.name)}
     </span>
   )}
 </div>
+
+<style>
+  .regular-label {
+    color: var(--bs-success-text-emphasis);
+    font-weight: bold;
+    opacity: 75%;
+  }
+</style>

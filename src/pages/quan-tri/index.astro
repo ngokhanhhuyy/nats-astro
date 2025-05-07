@@ -1,0 +1,77 @@
+---
+import { useRouteUtils } from "@/utils/routeUtils";
+import { useHTMLUtils } from "@/utils/htmlUtils";
+import { useDisplayNames } from "@/localization/displayNames";
+
+// Layout components.
+import ProtectedLayout from "@/layouts/protected/ProtectedLayout.astro";
+import MainBlock from "@/layouts/protected/MainBlock.astro";
+import { CatalogItemType } from "@/enums/catalogItemType";
+
+// Dependencies.
+const routeUtils = useRouteUtils();
+const { compute } = useHTMLUtils();
+const displayNames = useDisplayNames();
+
+// Computed.
+const routePathItems = compute(() => {
+  return [
+    {
+      path: routeUtils.getProtectedSliderItemListRoutePath(),
+      displayName: displayNames.sliderItem
+    },
+    {
+      path: routeUtils.getProtectedSummaryItemListRoutePath(),
+      displayName: displayNames.summaryItem
+    },
+    {
+      path: routeUtils.getProtectedAboutUsIntroductionDetailRoutePath(),
+      displayName: displayNames.aboutUs
+    },
+    {
+      path: routeUtils.getProtectedMemberListRoutePath(),
+      displayName: displayNames.members
+    },
+    {
+      path: routeUtils.getProtectedCertificateListRoutePath(),
+      displayName: displayNames.certificates
+    },
+    {
+      path: routeUtils.getProtectedContactListRoutePath(),
+      displayName: displayNames.contact
+    },
+    {
+      path: routeUtils.getProtectedEnquiryListRoutePath(),
+      displayName: displayNames.enquiry
+    },
+    {
+      path: routeUtils.getProtectedCatalogItemListRoutePath(CatalogItemType.Service),
+      displayName: displayNames.service
+    },
+    {
+      path: routeUtils.getProtectedCatalogItemListRoutePath(CatalogItemType.Course),
+      displayName: displayNames.course
+    }
+  ];
+});
+---
+
+<ProtectedLayout pageTitle="Bảng điều khiển">
+  <div class="row g-3">
+    <div class="col col-12">
+      <MainBlock title="Biểu đồ">
+        <div style="min-height: 500px"></div>
+      </MainBlock>
+    </div>
+
+    {routePathItems.map(item => (
+      <div class="col col-lg-3 col-md-4 col-6">
+        <a href={item.path} class="btn btn-outline-success w-100 filter-shadow-sm">
+          <span class="small fw-bold">
+            {item.displayName}
+          </span>
+        </a>
+      </div>
+    ))}
+  </div>
+</ProtectedLayout>

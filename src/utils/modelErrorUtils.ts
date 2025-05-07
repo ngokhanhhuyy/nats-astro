@@ -165,10 +165,8 @@ export function createModelErrorMessagesStore(): IModelErrorMessagesStore {
         return messages;
       }
 
-      for (const propertyErrors of Object.values(errorMessages)) {
-        for (const message of propertyErrors) {
-          messages.push(message);
-        }
+      for (const message of Object.values(errorMessages)) {
+        messages.push(message);
       }
 
       return messages;

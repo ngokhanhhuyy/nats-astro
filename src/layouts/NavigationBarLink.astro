@@ -1,11 +1,12 @@
 ---
-import { compute } from "@/utils/computeUtils";
+import { useHTMLUtils } from "@/utils/htmlUtils";
 
-type Props = {
-  href: string;
-}
-
+// Props.
+type Props = { href: string; }
 const props = Astro.props;
+
+// Dependencies.
+const { compute, joinHTMLClass } = useHTMLUtils();
 
 // Computed.
 const computedClassName = compute<string | undefined>(() => {
@@ -17,7 +18,13 @@ const computedClassName = compute<string | undefined>(() => {
 });
 ---
 
-
-<a href={props.href} class={computedClassName} class="nav-link">
+<a href={props.href} class={joinHTMLClass(computedClassName, "nav-link")}>
   <slot></slot>
 </a>
+
+<style>
+  .nav-link.active {
+    background-color: var(--bs-success) !important;
+    color: var(--bs-white);
+  }
+</style>

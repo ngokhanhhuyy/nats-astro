@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { createGeneralSettingsResponseDto }
-    from "@/dtos/generalSettings/generalSettingsResponseDtos";
+import { createGeneralSettingsResponseDto } from "@/dtos/generalSettings/generalSettingsResponseDtos";
 import { NotFoundError } from "@/errors";
 
 /**
@@ -11,13 +10,13 @@ import { NotFoundError } from "@/errors";
  * @example getAsync();
  */
 async function getAsync(): Promise<GeneralSettingsResponseDto> {
-    const prisma = new PrismaClient();
-	const entity = await prisma.generalSettings.findFirst();
-    if (!entity) {
-        throw new NotFoundError();
-    }
+  const prisma = new PrismaClient();
+  const entity = await prisma.generalSettings.findFirst();
+  if (!entity) {
+    throw new NotFoundError();
+  }
 
-    return createGeneralSettingsResponseDto(entity);
+  return createGeneralSettingsResponseDto(entity);
 }
 
 /**
@@ -31,20 +30,17 @@ async function getAsync(): Promise<GeneralSettingsResponseDto> {
  * during the operation.
  */
 async function updateAsync(requestDto: GeneralSettingsUpdateRequestDto): Promise<void> {
-	const prisma = new PrismaClient();
-    const updatedGeneralSettings = await prisma.generalSettings.update({
-        where: {
-            id: 1,
-        },
-        data: {
-            applicationName: requestDto.applicationName,
-            applicationShortName: requestDto.applicationShortName,
-            isUnderMaintainance: requestDto.underMaintainance
-        }
-    });
+  const prisma = new PrismaClient();
+  const updatedGeneralSettings = await prisma.generalSettings.update({
+    where: {
+      id: 1,
+    },
+    data: {
+      applicationName: requestDto.applicationName,
+      applicationShortName: requestDto.applicationShortName,
+      isUnderMaintainance: requestDto.underMaintainance,
+    },
+  });
 }
 
-export {
-	getAsync as getGeneralSettingsAsync,
-	updateAsync as updateGeneralSettingsAsync
-};
+export { getAsync as getGeneralSettingsAsync, updateAsync as updateGeneralSettingsAsync };

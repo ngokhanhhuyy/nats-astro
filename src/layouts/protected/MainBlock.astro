@@ -1,6 +1,7 @@
 ---
-import { compute } from "@/utils/computeUtils";
+import { useHTMLUtils } from "@/utils/htmlUtils";
 
+// Props.
 type Props = {
   title: string;
   color?: "primary" | "success" | "danger";
@@ -10,12 +11,14 @@ type Props = {
   bodyPadding?: string | number | [number, number] | [number, number, number, number];
   bodyBorder?: boolean;
 };
+const { color = "success", ...props } = Astro.props;
 
-const props = Astro.props;
+// Dependencies.
+const { compute, joinHTMLClass } = useHTMLUtils();
 
 // Computed.
 const headerComputedClass = compute<string>(() => {
-  let className = `bg-${props.color}-subtle border-${props.color}-subtle`;
+  let className = `bg-${color}-subtle border-${color}-subtle`;
   if (props.headerClass) {
     className += ` ${props.headerClass}`;
   }
@@ -24,13 +27,13 @@ const headerComputedClass = compute<string>(() => {
 });
 
 const bodyComputedClass = compute<string | null>(() => {
-  const classNames: string[] = [];
+  const classNames: string[] = ["rounded-bottom-3 bg-white"];
   if (props.bodyClass) {
     classNames.push(props.bodyClass);
   }
 
-  if (props.bodyBorder) {
-    classNames.push("border border-top-0");
+  if (props.bodyBorder ?? true) {
+    classNames.push(`border border-top-0 border-${color}-subtle`);
   }
 
   if (Array.isArray(props.bodyPadding)) {
@@ -49,16 +52,16 @@ const bodyComputedClass = compute<string | null>(() => {
 });
 ---
 
-<div class="block d-flex flex-column filter-shadow-sm">
-  <div class={headerComputedClass} class="block-header">
-    <span class="fw-bold small text-success h-auto pt-1">
+<div class="block d-flex flex-column">
+  <div class={joinHTMLClass(headerComputedClass, "block-header")}>
+    <span class={joinHTMLClass("fw-bold small h-auto pt-1", `text-${color}`)}>
       {props.title.toUpperCase()}
     </span>
 
     <slot name="header"></slot>
   </div>
 
-  <div v-bind:class="bodyComputedClass" class="block-body flex-fill">
+  <div class={bodyComputedClass} class="block-body flex-fill">
     <slot>
       <slot name="body"></slot>
     </slot>

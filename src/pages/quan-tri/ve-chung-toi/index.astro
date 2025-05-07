@@ -1,0 +1,100 @@
+---
+import { getAboutUsIntroductionAsync } from "@/services/aboutUsIntroductionService";
+import { createAboutUsIntroductionDetailModel } from "@/models/aboutUsIntroductionModels";
+import { useHTMLUtils } from "@/utils/htmlUtils";
+import { useRouteUtils } from "@/utils/routeUtils";
+import { useDisplayNames } from "@/localization/displayNames";
+
+// Layout components.
+import ProtectedLayout from "@/layouts/protected/ProtectedLayout.astro";
+import MainBlock from "@/layouts/protected/MainBlock.astro";
+
+// Dependencies.
+const { compute } = useHTMLUtils();
+const routeUtils = useRouteUtils();
+const displayNames = useDisplayNames();
+
+// Model.
+const responseDto = await getAboutUsIntroductionAsync();
+const model = createAboutUsIntroductionDetailModel(responseDto);
+
+// Computed.
+const primaryContents = compute<{ displayName: string; content: string }[]>(() => {
+  return [
+    {
+      displayName: displayNames.aboutUs,
+      content: model.aboutUsContent,
+    },
+    {
+      displayName: displayNames.whyChooseUs,
+      content: model.whyChooseUsContent
+    },
+    {
+      displayName: displayNames.ourDifference,
+      content: model.ourDifferenceContent
+    },
+    {
+      displayName: displayNames.ourCulture,
+      content: model.ourCultureContent
+    }
+  ]
+});
+---
+<ProtectedLayout pageTitle="Về chúng tôi">
+  <div class="row g-3 justify-content-end">
+    <div class="col col-12">
+      <MainBlock title="Về chúng tôi" bodyPadding={[3, 3, 2, 3]}>
+        <div class="row g-3 justify-content-center">
+          <!-- Thumbnail -->
+          {model.thumbnailUrl && (
+            <div class="col col-lg-3 col-sm-6 col-8">
+              <img
+                src={model.thumbnailUrl}
+                class="img-thumbnail"
+                alt={Astro.locals.generalSettings.applicationName}
+              />
+            </div>
+          )}
+
+          <!-- MainQuoteContent -->
+          <div class="col col-xl-9 col-12">
+            <label>{displayNames.mainQuote}</label>
+            <div class="text-success">
+              {model.mainQuoteContent}
+            </div>
+          </div>
+        
+          <!-- PrimaryContents -->
+          {primaryContents.map((item) => (
+            <div class="col col-lg-6 col-12">
+              <label>{item.displayName}</label>
+              <div class="text-success">
+                {item.content.split(/\r?\n/).map((paragraph) => (
+                  <>
+                    {paragraph}
+                    <br/>
+                  </>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </MainBlock>
+    </div>
+
+    <div class="col col-auto">
+      <a href={model.updateRoutePath} class="btn btn-success">
+        <i class="bi bi-pencil-square me-1"></i>
+        <span>Sửa</span>
+      </a>
+    </div>
+  </div>
+</ProtectedLayout>
+
+<style>
+  label {
+    color: var(--bs-success-text-emphasis);
+    font-weight: bold;
+    opacity: 75%;
+  }
+</style>

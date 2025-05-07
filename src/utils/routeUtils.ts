@@ -1,58 +1,91 @@
 import { CatalogItemType } from "@/enums/catalogItemType";
 
-export const getPublicHomeRoutePath = () => "/trang-chu";
-export const getPublicAboutUsIntroductionRoutePath = () => "/ve-chung-toi";
-export const getPublicSummaryItemsRoutePath = (id?: number): string => {
-	if (id != null) {
-		return `/gioi-thieu?id=${id}`;
-	}
+const routeUtils = {
+  getPublicHomeRoutePath: () => "/trang-chu",
+  getPublicAboutUsIntroductionRoutePath : () => "/ve-chung-toi",
+  getPublicSummaryItemsRoutePath: (id?: number) => {
+    if (id != null) {
+      return `/gioi-thieu?id=${id}`;
+    }
 
-	return "/gioi-thieu";
-};
-export const getPublicServiceListRoutePath = () => "/dich-vu";
-export const getPublicServiceDetailRoutePath = (id: number) => `/dich-vu/${id}`;
-export const getPublicCourseListRoutePath = () => "/khoa-hoc";
-export const getPublicCourseDetailRoutePath = (id: number) => `/khoa-hoc/${id}`;
-export const getPublicProductListRoutePath = () => "/san-pham";
-export const getPublicProductDetailRoutePath = (id: number) => `/san-pham/${id}`;
-export const getPublicContactsRoutePath = () => "/lien-he";
-export const getPublicEnquiryRoutePath = () => "/cau-hoi";
+    return "/gioi-thieu";
+  },
+  getPublicServiceListRoutePath : () => "/dich-vu",
+  getPublicServiceDetailRoutePath: (id: number) => `/dich-vu/${id}`,
+  getPublicCourseListRoutePath : () => "/khoa-hoc",
+  getPublicCourseDetailRoutePath: (id: number) => `/khoa-hoc/${id}`,
+  getPublicProductListRoutePath : () => "/san-pham",
+  getPublicProductDetailRoutePath: (id: number) => `/san-pham/${id}`,
+  getPublicContactsRoutePath : () => "/lien-he",
+  getPublicEnquiryRoutePath : () => "/cau-hoi",
 
-export const getSignInRoutePath = () => "/dang-nhap";
-export const getSignOutRoutePath = () => "/dang-xuat";
+  getSignInRoutePath : () => "/dang-nhap",
+  getSignOutRoutePath : () => "/dang-xuat",
 
-export const getProtectedRoutePath = () => "/quan-tri";
-export const getProtectedDashboardRoutePath = () => "/quan-tri/bang-dieu-khien";
-export const getProtectedContentRoutePath = () => "/quan-tri/noi-dung";
-export const getProtectedSliderItemCreateRoutePath = () => {
-	return "/quan-tri/noi-dung/trinh-chieu-anh";
-};
+  getProtectedRoutePath : () => "/quan-tri",
+  getProtectedDashboardRoutePath : () => "/quan-tri",
 
-export const getProtectedSliderItemUpdateRoutePath = (id: number) => {
-	return `/quan-tri/noi-dung/trinh-chieu-anh/${id}`;
-};
+  // Protected - slider items route paths.
+  getProtectedSliderItemListRoutePath : () => "/quan-tri/trinh-chieu-anh",
+  getProtectedSliderItemCreateRoutePath : () => "/quan-tri/trinh-chieu-anh/tao-moi",
+  getProtectedSliderItemUpdateRoutePath: (id: number) => {
+    return `/quan-tri/trinh-chieu-anh/${id}/chinh-sua`;
+  },
 
-export const getProtectedSummaryItemUpdateRoutePath = (id: number) => {
-	return `/quan-tri/noi-dung/gioi-thieu/${id}`;
-};
+  // Protected - summary items route paths.
+  getProtectedSummaryItemListRoutePath : () => "/quan-tri/gioi-thieu",
+  getProtectedSummaryItemDetailRoutePath: (id: number) => `/quan-tri/gioi-thieu/${id}`,
+  getProtectedSummaryItemUpdateRoutePath: (id: number) => {
+    return `/quan-tri/gioi-thieu/${id}/chinh-sua`;
+  },
 
-export const getProtectedAboutUsIntroductionUpdateRoute = () => {
-	return "/quan-tri/noi-dung/ve-chung-toi";
-};
+  // Protected - about us introduction route paths.
+  getProtectedAboutUsIntroductionDetailRoutePath : () => "/quan-tri/ve-chung-toi",
+  getProtectedAboutUsIntroductionUpdateRoutePath : () => "/quan-tri/ve-chung-toi/chinh-sua",
 
-export const getProtectedMemberCreateRoutePath = () => "/quan-tri/noi-dung/doi-ngu";
-export const getProtectedMemberUpdateRoutePath = (id: number) => {
-	return `/quan-tri/noi-dung/doi-ngu/${id}`;
-};
+  // Protected - member route paths.
+  getProtectedMemberListRoutePath : () => "/quan-tri/doi-ngu",
+  getProtectedMemberCreateRoutePath : () => "/quan-tri/doi-ngu/tao-moi",
+  getProtectedMemberUpdateRoutePath: (id: number) => `/quan-tri/doi-ngu/${id}/chinh-sua`,
 
-export const getProtectedCertificateCreateRoutePath = () => "/quan-tri/noi-dung/chung-chi";
-export const getProtectedCertificateUpdateRoutePath = (id: number) => {
-	return `/quan-tri/noi-dung/chung-chi/${id}`;
-};
+  // Protected - certificate route paths.
+  getProtectedCertificateListRoutePath : () => "/quan-tri/chung-chi",
+  getProtectedCertificateCreateRoutePath : () => "/quan-tri/chung-chi/tao-moi",
+  getProtectedCertificateUpdateRoutePath: (id: number) => {
+    return `/quan-tri/chung-chi/${id}/chinh-sua`;
+  },
 
-export const getProtectedCatalogItemCreateRoutePath = (type: CatalogItemType) => {
-	return `/quan-tri/noi-dung/catalog?type=${type}`;
-};
-export const getProtectedCatalogItemUpdateRoutePath = (id: number) => {
-	return `/quan-tri/noi-dung/catalog/${id}`;
-};
+  // Protected - catalog item route paths.
+  getProtectedCatalogItemListRoutePath: (type?: CatalogItemType) => {
+    const path = "/quan-tri/catalog";
+    if (type) {
+      return path + `?type=${type}`;
+    }
+
+    return path;
+  },
+
+  getProtectedCatalogItemCreateRoutePath: (type: CatalogItemType) => {
+    return `/quan-tri/catalog/tao-moi?type=${type}`;
+  },
+
+  getProtectedCatalogItemUpdateRoutePath: (id: number) => {
+    return `/quan-tri/catalog/${id}/chinh-sua`;
+  },
+
+  // Protected - contacts.
+  getProtectedContactListRoutePath : () => "/quan-tri/lien-he",
+  getProtectedContactDetailRoutePath: (id: number) => `/quan-tri/lien-he/${id}`,
+  getProtectedContactCreateRoutePath : () => "/quan-tri/lien-he/tao-moi",
+  getProtectedContactUpdateRoutePath: (id: number) => `/quan-tri/lien-he/${id}/chinh-sua`,
+
+  // Protected - enquiries.
+  getProtectedEnquiryListRoutePath : () => "/quan-tri/cau-hoi",
+  getProtectedEnquiryDetailRoutePath: (id: number) => `/quan-tri/cau-hoi/${id}`,
+  getProtectedEnquiryCreateRoutePath : () => "/quan-tri/cau-hoi",
+  getProtectedEnquiryUpdateRoutePath: (id: number) => `/quan-tri/cau-hoi/${id}`
+}
+
+export function useRouteUtils() {
+  return routeUtils;
+}

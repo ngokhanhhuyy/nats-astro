@@ -1,0 +1,315 @@
+---
+import type { JSX } from "astro/jsx-runtime";
+import { useHTMLUtils } from "@/utils/htmlUtils";
+
+// Props.
+type Props = { name: string; value?: string | null } & JSX.InputHTMLAttributes;
+
+// Dependencies.
+const { compute, joinHTMLClass } = useHTMLUtils();
+
+// Computed.
+const containerClassName = compute<string | undefined>(() => {
+  if (Astro.locals.modelErrorMessagesStore.hasError(Astro.props.name)) {
+    return "error";
+  }
+});
+
+const thumbnailPreviewClassName = compute(() => (!Astro.props.value ? "d-none" : undefined));
+const thumbnailAddingIndicatorClassName = compute(() => {
+  return Astro.props.value ? "d-none" : undefined;
+});
+---
+
+<div class={joinHTMLClass("thumbnail-input-container", containerClassName)}>
+  <button type="button" class="click-area"></button>
+  <input type="file" class="d-none" accept="image/png, image/jpeg, image/jpg" />
+  <input type="hidden" name={Astro.props.name} value={Astro.props.value} />
+
+  <!-- Thumbnail Preview -->
+  <div class={joinHTMLClass("thumbnail-preview", thumbnailPreviewClassName)}>
+    <img src={Astro.props.value ?? ""} class="img-thumbnail" />
+    <button type="button" class="btn btn-danger rounded-circle delete-button"> + </button>
+  </div>
+
+  <!-- Thumbnail Adding Indicator -->
+  <div class={joinHTMLClass("thumbnail-adding-indicator", thumbnailAddingIndicatorClassName)}>
+    <div class="adding-indicator-text">
+      <span>Thêm ảnh</span>
+      <i class="bi bi-plus-lg"></i>
+    </div>
+
+    <div class="validation-message-container d-none">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <span class="validation-message mx-2"></span>
+      <i class="bi bi-exclamation-triangle-fill"></i>
+    </div>
+  </div>
+
+  <!-- Thumbnail Loading Indicator -->
+  <div class="thumbnail-loading-indicator d-none">
+    <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+    <span role="status">Đang xử lý ...</span>
+  </div>
+</div>
+
+<script>
+  type Mode = "thumbnailAdded" | "thumbnailCleared" | "thumbnailUploading";
+  type UploadedResultJSON = { thumbnailUrl: string; imageUrl: string };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const containerQuery = ".thumbnail-input-container"
+    const containerElements = document.querySelectorAll<HTMLDivElement>(containerQuery);
+    containerElements.forEach(containerElement => {
+      const buttonElement = containerElement.querySelector(".click-area") as HTMLButtonElement;
+      const fileInputElement = containerElement
+        .querySelector(`input[type="file"]`) as HTMLInputElement;
+      const hiddenInputElement = containerElement
+        .querySelector(`input[type="hidden"]`) as HTMLInputElement;
+      const thumbnailPreviewElement = containerElement
+        .querySelector(".thumbnail-preview") as HTMLDivElement;
+      const thumbnailAddingIndicatorElement = containerElement
+        .querySelector(".thumbnail-adding-indicator") as HTMLDivElement;
+      const thumbnailUploadingInidicatorElement = containerElement
+        .querySelector(".thumbnail-loading-indicator") as HTMLDivElement;
+      const thumbnailPreviewImageElement = thumbnailPreviewElement
+        .querySelector("img") as HTMLImageElement;
+      const thumbnailClearButtonElement = thumbnailPreviewElement
+        .querySelector("button") as HTMLButtonElement;
+      const thumbnailAddingIndicatorTextElement = thumbnailAddingIndicatorElement
+        .querySelector(".adding-indicator-text") as HTMLDivElement;
+      const validationMessageContainerElement = thumbnailAddingIndicatorElement
+        .querySelector(".validation-message-container") as HTMLDivElement;
+      const validationMessageElement = thumbnailAddingIndicatorElement
+        .querySelector(".validation-message") as HTMLSpanElement;
+
+      buttonElement.addEventListener("click", () => {
+        fileInputElement.click();
+      });
+
+      thumbnailClearButtonElement.addEventListener("click", clearThumbnail);
+
+      fileInputElement.addEventListener("change", async (event) => {
+        const inputElement = event.target as HTMLInputElement;
+        if (!inputElement.files || !inputElement.files[0]) {
+          clearThumbnail(event);
+          return;
+        }
+
+        const file = inputElement.files[0];
+        try {
+          await validateFile(file);
+          showValidationErrorMessage(null);
+          switchMode("thumbnailUploading");
+          const uploadedResult = await uploadFile(file);
+          switchMode("thumbnailAdded");
+          thumbnailPreviewImageElement.setAttribute("src", uploadedResult.imageUrl);
+          hiddenInputElement.value = uploadedResult.imageUrl;
+        } catch (error) {
+          if (typeof error !== "string") {
+            throw error;
+          }
+
+          showValidationErrorMessage("File phải có kích thước nhỏ hơn 3MB");
+        }
+      });
+
+      /**
+       * Clears thumbnail url and images, shows the thumbnail adding elements.
+       *
+       * @param {Event} event
+       */
+      function clearThumbnail(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+        switchMode("thumbnailCleared");
+        thumbnailPreviewImageElement.removeAttribute("src");
+        hiddenInputElement.value = "";
+      }
+
+      /**
+       * Validates if the file is valid by type and by size. The given file must be a valid
+       * PNG or JPEG/JPG file and its size must be equal or less than 3MB.
+       *
+       * @param {File} file
+       * @returns {Promise<void>}
+       *
+       * @throws {"FileTooLarge"} When the given file size exceeds 3MB.
+       * @throws {"InvalidFileType"} When the given file type is not any of PNG or JPEG/JPG.
+       */
+      async function validateFile(file: File): Promise<void> {
+        return new Promise((resolve, reject) => {
+          if (file.size > 3 * 1024 * 1024) {
+            reject("File phải có kích thước nhỏ hơn 3MB");
+          }
+
+          const reader = new FileReader();
+          reader.onload = () => {
+            const readerResult = reader.result as ArrayBuffer;
+            const arr = new Uint8Array(readerResult);
+
+            // PNG signature: 89 50 4E 47 0D 0A 1A 0A.
+            const isPng =
+              arr[0] === 0x89 && arr[1] === 0x50 && arr[2] === 0x4e && arr[3] === 0x47;
+
+            // JPEG signature: FF D8 ... FF D9.
+            const isJpeg = arr[0] === 0xff && arr[1] === 0xd8;
+
+            if (!isPng && !isJpeg) {
+              reject("File phải là ảnh PNG hoặc JPEG/JPG");
+            }
+
+            resolve();
+          };
+
+          reader.readAsArrayBuffer(file.slice(0, 4));
+        });
+      }
+
+      /**
+       * Uploads the specified file to ImgBB api and retrieve the image url.
+       *
+       * @param file
+       * @returns {Promise<UploadedResultJSON>} A {@link Promise} which resolves to an object
+       * containing the preview thumbnail url and the full size image url.
+       *
+       * @throws {"InvalidFileType"} Throws when the uploaded file type is invalid.
+       * @throws {Error} Throws when the uploading process failed with undefined reason.
+       */
+      async function uploadFile(file: File): Promise<UploadedResultJSON> {
+        const formData = new FormData();
+        formData.append("source", file);
+        const response = await fetch(`/api/imageUpload`, {
+          method: "post",
+          body: formData,
+        });
+
+        const json: UploadedResultJSON = await response.json();
+        if (response.status === 400) {
+          throw "InvalidFileType";
+        }
+
+        return json;
+      }
+
+      /**
+       * Shows validation error messsage and adds style to the container which indicates that
+       * there is error. If value for {@link message} is null or empty, the validation error
+       * message and the style will be cleared.
+       *
+       * @param {string | null} message
+       */
+      function showValidationErrorMessage(message: string | null): void {
+        if (message) {
+          containerElement.classList.add("error");
+          thumbnailAddingIndicatorTextElement.classList.add("d-none");
+          validationMessageContainerElement.classList.remove("d-none");
+          validationMessageElement.textContent = message;
+          return;
+        }
+
+        containerElement.classList.remove("error");
+        thumbnailAddingIndicatorTextElement.classList.remove("d-none");
+        validationMessageContainerElement.classList.add("d-none");
+        validationMessageElement.textContent = "";
+      }
+
+      /**
+       * Switch visible indicator corresponding to the given mode.
+       *
+       * @param {Mode} mode
+       */
+      function switchMode(mode: Mode): void {
+        const elementForModes = {
+          thumbnailAdded: thumbnailPreviewElement,
+          thumbnailCleared: thumbnailAddingIndicatorElement,
+          thumbnailUploading: thumbnailUploadingInidicatorElement,
+        };
+
+        for (const [evaluatingMode, element] of Object.entries(elementForModes)) {
+          if (evaluatingMode === mode) {
+            element.classList.remove("d-none");
+          } else {
+            element.classList.add("d-none");
+          }
+        }
+      }
+    });
+  });
+</script>
+
+<style>
+  .thumbnail-input-container {
+    --transition-duration: 0.15s;
+    --transition-timing-function: ease;
+    background-color: rgba(var(--bs-secondary-rgb), 0.1);
+    color: var(--bs-secondary);
+    border: 1px solid rgba(var(--bs-secondary-rgb), 0.25);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    min-height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    transition:
+      background-color var(--transition-duration) var(--transition-timing-function),
+      border var(--transition-duration) var(--transition-timing-function),
+      color var(--transition-duration) var(--transition-timing-function);
+  }
+
+  .thumbnail-input-container.error {
+    background-color: rgba(var(--bs-danger-rgb), 0.1);
+    color: var(--bs-danger);
+    border-color: rgba(var(--bs-danger-rgb), 0.25);
+  }
+
+  .thumbnail-input-container:not(:has(.thumbnail-adding-indicator.d-none)):not(.error):hover {
+    color: var(--bs-success);
+    background: rgba(var(--bs-success-rgb), 0.1);
+    border-color: rgba(var(--bs-success-rgb), 0.5);
+  }
+
+  .click-area {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+
+  .thumbnail-preview {
+    width: 150px;
+    height: 150px;
+    position: relative;
+  }
+
+  .thumbnail-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50%;
+    border-color: rgba(var(--bs-success-rgb), 0.5) !important;
+    box-shadow: var(--bs-box-shadow-sm);
+  }
+
+  .thumbnail-preview button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1;
+    padding: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: scale(125%) translate(25%, -25%) rotate(-45deg);
+    box-shadow: var(--bs-box-shadow-sm);
+  }
+
+  .thumbnail-adding-indicator {
+    font-weight: bold;
+  }
+</style>

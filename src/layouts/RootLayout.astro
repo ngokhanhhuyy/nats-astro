@@ -1,4 +1,8 @@
 ---
+// Layout component.
+import NavigationBar from "./NavigationBar.astro";
+import FloatingButtons from "./FloatingButtons.astro";
+
 export type Props = {
 	pageTitle: string;
 }
@@ -19,7 +23,11 @@ const props = Astro.props;
     <title>{props.pageTitle}</title>
   </head>
   <body>
-    <slot />
+    <NavigationBar />
+    <div class="main-wrapper">
+      <slot />
+    </div>
+    <FloatingButtons />
   </body>
 </html>
 
@@ -28,7 +36,16 @@ const props = Astro.props;
   body {
     margin: 0;
     width: 100%;
-    height: 100%;
+    min-height: 100vh;
+  }
+
+  .main-wrapper {
+    margin-top: var(--navbar-height);
+    width: 100%;
+    min-height: calc(100vh - var(--navbar-height));
+    display: flex;
+    justify-content: stretch;
+    align-items: stretch;
   }
 </style>
 

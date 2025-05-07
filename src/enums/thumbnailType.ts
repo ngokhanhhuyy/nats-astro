@@ -1,4 +1,4 @@
 export enum ThumbnailType {
-	Photo,
-	YoutubeVideo
+	Photo = "Photo",
+	YoutubeVideo = "YoutubeVideo"
 }

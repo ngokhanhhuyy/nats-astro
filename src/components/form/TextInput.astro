@@ -1,0 +1,26 @@
+---
+import type { JSX } from "astro/jsx-runtime";
+import { useHTMLUtils } from "@/utils/htmlUtils";
+
+// Props.
+type Props = { name: string } & Omit<JSX.InputHTMLAttributes, "type">;
+
+// Dependencies.
+const { compute } = useHTMLUtils();
+
+// Computed.
+const computedClass = compute<string>(() => {
+  const names = [
+    Astro.props.class,
+    "form-control"
+  ];
+
+  if (Astro.locals.modelErrorMessagesStore.hasError(Astro.props.name)) {
+    names.push(Astro.locals.modelErrorMessagesStore.getInputClass(Astro.props.name));
+  } 
+
+  return names.filter(name => name).join(" ");
+});
+---
+
+<input {...Astro.props} type="text" class={computedClass} />
