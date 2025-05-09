@@ -69,6 +69,10 @@ const routeUtils = {
     return `/quan-tri/catalog/tao-moi?type=${type}`;
   },
 
+  getProtectedCatalogItemDetailRoutePath: (id: number) => {
+    return `/quan-tri/catalog/${id}`;
+  },
+
   getProtectedCatalogItemUpdateRoutePath: (id: number) => {
     return `/quan-tri/catalog/${id}/chinh-sua`;
   },

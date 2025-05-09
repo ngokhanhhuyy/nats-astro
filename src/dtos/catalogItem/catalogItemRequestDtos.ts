@@ -7,18 +7,10 @@ declare global {
 
   type CatalogItemUpsertRequestDto = {
     name: string;
+    type: CatalogItemType;
     summary: string;
     detail: string;
-    thumbnailFile: string | null;
-    thumbnailChanged: boolean;
-    photos: CatalogItemUpsertPhotoRequestDto[];
-  };
-
-  type CatalogItemUpsertPhotoRequestDto = {
-    id: number | null;
-    file: string | null;
-    description: string | null;
-    isDeleted: boolean;
+    thumbnailUrl: string | null;
   };
 }
 

@@ -5,5 +5,6 @@ declare namespace App {
     modelErrorMessagesStore: import("@/utils/modelErrorUtils").IModelErrorMessagesStore;
     caller: UserDetailModel | null;
     generalSettings: GeneralSettingsDetailModel;
+    contacts: ContactDetailModel[];
   }
 }

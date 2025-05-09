@@ -116,3 +116,7 @@ const service = {
     }
   }
 };
+
+export function useSummaryItemService() {
+  return service;
+}

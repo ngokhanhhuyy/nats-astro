@@ -1,0 +1,13 @@
+---
+// Layout components.
+import RootLayout, { type Props as RootLayoutProps } from "../RootLayout.astro";
+
+// Props.
+type Props = RootLayoutProps;
+---
+
+<RootLayout pageTitle={Astro.props.pageTitle}>
+  <main class="flex-fill h-100">
+    <slot />
+  </main>
+</RootLayout>
