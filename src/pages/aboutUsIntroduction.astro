@@ -1,0 +1,89 @@
+---
+import { useAboutUsIntroductionService } from "@/services/aboutUsIntroductionService";
+import { createAboutUsIntroductionDetailModel } from "@/models/aboutUsIntroductionModels";
+import { useDisplayNames } from "@/localization/displayNames";
+import { usePhotoUtils } from "@/utils/photoUtils";
+
+// Layout component.
+import PublicSubPageLayout from "@/layouts/public/PublicSubPageLayout.astro";
+
+// Child component.
+import Content from "@/components/routes/public/aboutUsIntroduction/Content.astro";
+
+// Dependencies.
+const service = useAboutUsIntroductionService();
+const displayNames = useDisplayNames();
+const photoUtils = usePhotoUtils();
+
+// Model.
+const responseDto = await service.getAsync();
+const model = createAboutUsIntroductionDetailModel(responseDto);
+---
+
+<PublicSubPageLayout pageTitle="Về chúng tôi">
+  <div class="container p-4" id="about-us-view">
+    {/* Thumbnail */}
+    <div class="row justify-content-center px-3 py-3 mb-4">
+      <div class="col col-xl-6 col-lg-7 col-md-8 col-12 order-lg-0 order-1">
+        <img
+          src={model.thumbnailUrl ?? photoUtils.getDefaultPhotoUrl()}
+          class="w-100 rounded-4 shadow"
+          alt="Về chúng tôi"
+        />
+      </div>
+    </div>
+  
+  
+    <div class="row gx-5 gy-3 justify-content-center">
+      {/* AboutUsContent */}
+      <Content title={displayNames.aboutUs} content={model.aboutUsContent} />
+
+      {/* WhyChooseUsContent */}
+      <Content title={displayNames.whyChooseUs} content={model.whyChooseUsContent} />
+
+      {/* OurDifferenceContent */}
+      <Content title={displayNames.ourDifference} content={model.ourDifferenceContent} />
+
+      {/* OurCultureContent */}
+      <Content title={displayNames.ourCulture} content={model.ourCultureContent} />
+    </div>
+      
+    {/* Members */}
+    <div class="row gx-5 gy-3 justify-content-center mt-2">
+      <div class="col col-lg-12 col-md-10 col-12">
+        <h2 class="text-success text-center fw-normal">
+          Đội ngũ của chúng tôi
+        </h2>
+      </div>
+
+      {m}
+    </div>
+  
+      {/* Certificates */}
+      <div class="row gx-5 gy-3 justify-content-center my-2">
+          <div class="col col-md-10 col-12">
+              <h2 class="text-success text-center fw-normal">
+                  Chứng chỉ
+              </h2>
+          </div>
+          
+          @foreach (CertificateDetailModel certificate in Model.Certificates)
+          {
+              <div class="col col-xl-5 col-md-10 col-12">
+                  <div class="d-flex flex-column justify-content-stretch align-items-stretch">
+                      <img
+                          class="rounded-top-3 shadow"
+                          src="@certificate.ThumbnailUrl"
+                          alt="@certificate.Name"
+                      />
+                      
+                      <div class="bg-success-subtle text-center text-success border
+                                  border-success fs-5 fw-bold px-3 py-2 shadow rounded-bottom-3">
+                          @certificate.Name
+                      </div>
+                  </div>
+              </div>
+          }
+      </div>
+  </div>
+</PublicSubPageLayout>

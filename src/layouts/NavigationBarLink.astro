@@ -2,15 +2,18 @@
 import { useHTMLUtils } from "@/utils/htmlUtils";
 
 // Props.
-type Props = { href: string; }
-const props = Astro.props;
+type Props = { href: string; };
 
 // Dependencies.
 const { compute, joinHTMLClass } = useHTMLUtils();
 
 // Computed.
 const computedClassName = compute<string | undefined>(() => {
-  if (Astro.url.pathname.startsWith(props.href)) {
+  if (Astro.url.pathname === "/" && Astro.props.href === Astro.url.pathname) {
+    return "active";
+  }
+
+  if (Astro.url.pathname !== "/" && Astro.url.pathname.startsWith(Astro.props.href)) {
     return "active";
   }
 
@@ -18,7 +21,7 @@ const computedClassName = compute<string | undefined>(() => {
 });
 ---
 
-<a href={props.href} class={joinHTMLClass(computedClassName, "nav-link")}>
+<a href={Astro.props.href} class={joinHTMLClass(computedClassName, "nav-link")}>
   <slot></slot>
 </a>
 

@@ -1,0 +1,61 @@
+---
+import { useRouteUtils } from "@/utils/routeUtils";
+import { useDisplayNames } from "@/localization/displayNames";
+
+// Form components.
+import Field from "@/components/form/Field.astro";
+import TextInput from "@/components/form/TextInput.astro";
+import TextAreaInput from "@/components/form/TextAreaInput.astro";
+
+// Dependencies.
+const { getPublicEnquiryRoutePath } = useRouteUtils();
+const displayNames = useDisplayNames();
+---
+
+<div class="container-fluid bg-success">
+  <div class="row justify-content-center p-4 pb-5">
+    <div class="col col-xxl-4 col-xl-5 col-lg-6 col-md-7 col-12">
+      <div class="mb-3 text-white fs-5 d-flex flex-column">
+        <div class="fs-2">Bạn cần tư vấn?</div>
+        <span>Hãy gửi câu hỏi cho chúng tôi</span>
+        <span class="small opacity-75">
+            * Chúng tôi sẽ không chia sẻ thông tin của bạn.
+        </span>
+      </div>
+
+      <form
+        action={getPublicEnquiryRoutePath()}
+        method="post"
+        class="bg-white rounded-4 shadow p-3 w-100 d-flex flex-column align-items-stretch"
+      >
+        {/* FullName */}
+        <Field name="fullName" displayName={displayNames.fullName} class="mb-3" floating>
+          <TextInput name="fullName" placeholder="" maxlength={50} />
+        </Field>
+
+        {/* PhoneNumber */}
+        <Field name="phoneNumber" displayName={displayNames.phoneNumber} class="mb-3" floating>
+          <TextInput type="tel" name="phoneNumber" placeholder="" maxlength={13} />
+        </Field>
+
+        {/* Email */}
+        <Field name="email" displayName={displayNames.email} class="mb-3" floating>
+          <TextInput type="email" name="email" placeholder="" maxlength={255} />
+        </Field>
+
+        {/* Content */}
+        <Field name="content" displayName={displayNames.content} class="mb-3" floating>
+          <TextAreaInput name="content" placeholder="" maxlength={1000} />
+        </Field>
+
+        {/* Submit */}
+        <button
+          type="submit"
+          class="btn btn-outline-success text-success align-self-end submit-button"
+        >
+          Gửi
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

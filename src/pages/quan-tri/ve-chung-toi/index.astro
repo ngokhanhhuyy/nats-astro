@@ -1,5 +1,5 @@
 ---
-import { getAboutUsIntroductionAsync } from "@/services/aboutUsIntroductionService";
+import { useAboutUsIntroductionService } from "@/services/aboutUsIntroductionService";
 import { createAboutUsIntroductionDetailModel } from "@/models/aboutUsIntroductionModels";
 import { useHTMLUtils } from "@/utils/htmlUtils";
 import { useRouteUtils } from "@/utils/routeUtils";
@@ -10,12 +10,13 @@ import ProtectedLayout from "@/layouts/protected/ProtectedLayout.astro";
 import MainBlock from "@/layouts/protected/MainBlock.astro";
 
 // Dependencies.
+const service = useAboutUsIntroductionService();
 const { compute } = useHTMLUtils();
 const routeUtils = useRouteUtils();
 const displayNames = useDisplayNames();
 
 // Model.
-const responseDto = await getAboutUsIntroductionAsync();
+const responseDto = await service.getAsync();
 const model = createAboutUsIntroductionDetailModel(responseDto);
 
 // Computed.
@@ -83,7 +84,7 @@ const primaryContents = compute<{ displayName: string; content: string }[]>(() =
     </div>
 
     <div class="col col-auto">
-      <a href={model.updateRoutePath} class="btn btn-success">
+      <a href={model.protectedUpdateRoutePath} class="btn btn-success">
         <i class="bi bi-pencil-square me-1"></i>
         <span>Sửa</span>
       </a>

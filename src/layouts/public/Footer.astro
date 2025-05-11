@@ -1,0 +1,116 @@
+---
+import { useHTMLUtils } from "@/utils/htmlUtils";
+import { useRouteUtils } from "@/utils/routeUtils";
+
+// Child components.
+import FooterContactLink from "./FooterContactLink.astro";
+
+// Dependencies.
+const { compute, joinHTMLClass } = useHTMLUtils();
+const routeUtils = useRouteUtils();
+
+// Computed.
+const adminLinkRoutePath = compute<string>(() => {
+  if (Astro.locals.caller) {
+    return routeUtils.getProtectedDashboardRoutePath();
+  }
+
+  return routeUtils.getSignInRoutePath();
+});
+---
+
+<footer class="container-fluid bg-dark" id="footer">
+  <div class="container text-white">
+    <div class="row gx-4 gy-5 justify-content-center align-items-stretch px-3 py-5 pb-4">
+      {/* Links - Left/Top column */}
+      <div class="col col-xl-2 col-lg-3 col-sm-6 col-12 links-column">
+        <span class="fw-bold fs-4 opacity-75"> Công ty </span>
+
+        {/* SummaryItems */}
+        <a href={routeUtils.getPublicSummaryItemsRoutePath()}> Giới thiệu </a>
+
+        {/* AboutUs */}
+        <a href={routeUtils.getPublicAboutUsIntroductionRoutePath()}> Về chúng tôi </a>
+
+        {/* News */}
+        <a href="#"> Tin tức </a>
+
+        {/* Contact */}
+        <a href={routeUtils.getPublicContactsRoutePath()}> Liên hệ </a>
+      </div>
+
+      {/* Links - Right/Bottom column */}
+      <div class="col col-xl-2 col-lg-3 col-sm-6 col-12 links-column">
+        <span class="fw-bold fs-4 opacity-75"> Lĩnh vực </span>
+
+        {/* Services */}
+        <a href={routeUtils.getPublicServiceListRoutePath()}> Dịch vụ </a>
+
+        {/* Courses */}
+        <a href={routeUtils.getPublicCourseListRoutePath()}> Khóa học </a>
+      </div>
+
+      {/* Contacts */}
+      <div class="col col-xl-5 col-lg-6 col-12">
+        <span class="fw-bold fs-4 opacity-75"> Liên hệ </span>
+
+        {Astro.locals.contacts.map((contact) => <FooterContactLink model={contact} />)}
+      </div>
+
+      {/* Logo */}
+      <div class="col d-flex flex-column justify-content-center align-items-center">
+        <div
+          class={joinHTMLClass(
+            "border border-4 rounded-circle d-flex justify-content-center",
+            "align-items-center footer-logo-container"
+          )}
+        >
+          <img src="https://iili.io/3vzwO9S.png" alt="" />
+        </div>
+
+        <div class="fw-bold fs-5 text-center mt-3">
+          {Astro.locals.generalSettings.applicationName}
+        </div>
+      </div>
+
+      {/* Copyright */}
+      <div class="col col-12 text-center">
+        Bản quyền {new Date().getFullYear()}
+        thuộc về
+        <a href="https://facebook.com/huy.nino.97" class="fw-bold">Ngô Khánh Huy</a>
+        <br />
+
+        {/* AdminLink */}
+        <a href={adminLinkRoutePath} class="btn btn-success btn-sm mt-3 sign-in-link">
+          {Astro.locals.caller ? "Bảng điều khiển" : "Đăng nhập"}
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+footer :global(a) {
+  color: white !important;
+}
+
+footer :global(a:not(:hover)) {
+  text-decoration: none;
+}
+
+.links-column a {
+  margin-top: .25rem;
+  margin-bottom: .25rem;
+  display: block;
+}
+
+.footer-logo-container {
+  width: 150px;
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.footer-logo-container img {
+  width: 65%;
+}
+</style>

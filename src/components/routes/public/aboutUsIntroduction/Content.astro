@@ -1,0 +1,17 @@
+---
+import { EOL } from "os";
+
+// Props.
+type Props = { title: string, content: string };
+---
+
+
+<div class="col col-lg-6 col-md-10 col-12">
+  <h2 class="text-success text-center fw-normal mb-3">
+      {Astro.props.title}
+  </h2>
+
+  {Astro.props.content.split(EOL).map((paragraph) => (
+    <p>{paragraph}</p>
+  ))}
+</div>

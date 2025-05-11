@@ -8,6 +8,15 @@ const formDataUtils = {
     }
 
     return dot.object(formDataAsObject);
+  },
+
+  searchParamsToObject(searchParams: URLSearchParams): object {
+    const searchParamsAsObject: Partial<Record<string, string>> = {};
+    for (const [path, value] of searchParams.entries()) {
+      searchParamsAsObject[path] = value;
+    }
+
+    return dot.object(this.formDataToObject);
   }
 };
 

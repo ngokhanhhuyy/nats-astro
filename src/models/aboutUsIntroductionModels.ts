@@ -20,7 +20,9 @@ declare global {
     whyChooseUsContent: string;
     ourDifferenceContent: string;
     ourCultureContent: string;
-    updateRoutePath: string;
+    publicDetailRoutePath: string;
+    protectedDetailRoutePath: string;
+    protectedUpdateRoutePath: string;
   }
 
   type AboutUsIntroductionUpdateModel = {
@@ -31,7 +33,7 @@ declare global {
     whyChooseUsContent: string;
     ourDifferenceContent: string;
     ourCultureContent: string;
-    detailRoutePath: string;
+    protectedDetailRoutePath: string;
     parseFromForm(formData: FormData): void;
     toRequestDto(): AboutUsIntroductionUpdateRequestDto;
   }
@@ -76,7 +78,13 @@ function createDetail(responseDto: ResponseDto): AboutUsIntroductionDetailModel 
     whyChooseUsContent: responseDto.whyChooseUsContent,
     ourDifferenceContent: responseDto.ourDifferenceContent,
     ourCultureContent: responseDto.ourCultureContent,
-    get updateRoutePath(): string {
+    get publicDetailRoutePath(): string {
+      return routeUtils.getPublicAboutUsIntroductionRoutePath();
+    },
+    get protectedDetailRoutePath(): string {
+      return routeUtils.getProtectedAboutUsIntroductionDetailRoutePath();
+    },
+    get protectedUpdateRoutePath(): string {
       return routeUtils.getProtectedAboutUsIntroductionUpdateRoutePath();
     }
   };
@@ -91,7 +99,7 @@ function createUpdate(responseDto?: ResponseDto): AboutUsIntroductionUpdateModel
     whyChooseUsContent: "",
     ourDifferenceContent: "",
     ourCultureContent: "",
-    get detailRoutePath(): string {
+    get protectedDetailRoutePath(): string {
       return routeUtils.getProtectedAboutUsIntroductionDetailRoutePath();
     }
   };

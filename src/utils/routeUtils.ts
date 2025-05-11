@@ -1,7 +1,7 @@
 import { CatalogItemType } from "@/enums/catalogItemType";
 
 const routeUtils = {
-  getPublicHomeRoutePath: () => "/trang-chu",
+  getPublicHomeRoutePath: () => "/",
   getPublicAboutUsIntroductionRoutePath : () => "/ve-chung-toi",
   getPublicSummaryItemsRoutePath: (id?: number) => {
     if (id != null) {

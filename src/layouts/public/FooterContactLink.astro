@@ -1,0 +1,78 @@
+---
+import { ContactType } from "@/enums/contactType";
+import { useHTMLUtils } from "@/utils/htmlUtils";
+import { useRouteUtils } from "@/utils/routeUtils";
+
+// Props.
+type Props = { model: ContactDetailModel };
+
+// Dependencies.
+const { compute, formatPhoneNumber } = useHTMLUtils();
+const routeUtils = useRouteUtils();
+
+// Computed.
+const iconClassName = compute<string>(() => {
+  const iconClassNamesByType = {
+    [ContactType.PhoneNumber]: "bi-telephone-fill",
+    [ContactType.ZaloNumber]: "bi-stop-circle-fill",
+    [ContactType.Email]: "bi-envelope-at-fill",
+    [ContactType.Address]: "bi-geo-alt-fill",
+  };
+
+  return iconClassNamesByType[Astro.props.model.type];
+});
+
+const formattedPhoneOrZaloNumber = compute(() => {
+  const type = Astro.props.model.type;
+  if (type !== ContactType.PhoneNumber && type !== ContactType.ZaloNumber) {
+    return "";
+  }
+
+  return formatPhoneNumber(Astro.props.model.content);
+});
+
+const encodedAddress = compute<string>(() => {
+  if (Astro.props.model.type !==  ContactType.Address) {
+    return "";
+  }
+
+  return encodeURIComponent(Astro.props.model.content);
+});
+---
+
+<div class="my-2">
+  {/* Label */}
+  <i class={`bi me-2 ${iconClassName}`}></i>
+
+  {/* PhoneNumber */}
+  {Astro.props.model.type === ContactType.PhoneNumber && (
+    <a href={`tel:${Astro.props.model.content}`}>
+      {formattedPhoneOrZaloNumber}
+    </a>
+  )}
+
+  {/* ZaloNumber */}
+  {Astro.props.model.type === ContactType.ZaloNumber && (
+    <a href={Astro.props.model.content} target="_blank" rel="noopener noreferrer">
+      {formattedPhoneOrZaloNumber}
+    </a>
+  )}
+
+  {/* Email */}
+  {Astro.props.model.type === ContactType.Email && (
+    <a href={`mailto:${Astro.props.model.content}`}>
+      {Astro.props.model.content}
+    </a>
+  )}
+
+  {/* Address */}
+  {Astro.props.model.type === ContactType.Address && (
+    <a
+      href={`https://maps.google.com/?q=${encodedAddress}`}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {Astro.props.model.content}
+    </a>
+  )}
+</div>

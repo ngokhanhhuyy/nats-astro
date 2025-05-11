@@ -1,38 +1,147 @@
 ---
+import { CatalogItemType } from "@/enums/catalogItemType";
 import { useSliderItemService } from "@/services/sliderItemService";
 import { useSummaryItemService } from "@/services/summaryItemService";
 import { useAboutUsIntroductionService } from "@/services/aboutUsIntroductionService";
 import { useCatalogItemService } from "@/services/catalogItemService";
 import { createSliderItemDetailModel } from "@/models/sliderItemModels";
-import { createSummaryItemDetailModel } from "@/models/summaryItemModels";
+import { createSummaryItemBasicModel } from "@/models/summaryItemModels";
 import { createAboutUsIntroductionDetailModel } from "@/models/aboutUsIntroductionModels";
-import { createCata }
-import { useRouteUtils } from "@/utils/routeUtils";
+import { createCatalogItemBasicModel } from "@/models/catalogItemModels";
+import { useHTMLUtils } from "@/utils/htmlUtils";
 
 // Layout component.
 import PublicLayout from "@/layouts/public/PublicLayout.astro";
+
+// Child components.
+import SliderItemList from "@/components/routes/public/home/SliderItemList.astro";
+import SummaryItemList from "@/components/routes/public/home/SummaryItemList.astro";
+import CatalogItemList from "@/components/routes/public/home/CatalogItemList.astro";
+import EnquiryForm from "@/components/routes/public/EnquiryForm.astro";
 
 // Dependencies.
 const sliderItemService = useSliderItemService();
 const summaryItemService = useSummaryItemService();
 const aboutUsIntroductionService = useAboutUsIntroductionService();
 const catalogItemService = useCatalogItemService();
+const { joinHTMLClass } = useHTMLUtils();
 
 // Models.
 const [
   sliderItemResponseDtos,
   summaryItemResponseDtos,
   aboutUsIntroductionResponseDtos,
-  catalogItemResponseDtos
+  catalogItemResponseDtos,
 ] = await Promise.all([
   sliderItemService.getListAsync(),
   summaryItemService.getBasicListAsync(),
   aboutUsIntroductionService.getAsync(),
-  catalogItemService.getListAsync({ })
+  catalogItemService.getListAsync(),
 ]);
 
-return {
-  sliderItems: sliderItemResponseDtos.map(dto => cr)
-}
+const model = {
+  sliderItems: sliderItemResponseDtos.map(createSliderItemDetailModel),
+  summaryItems: summaryItemResponseDtos.map(createSummaryItemBasicModel),
+  aboutUsIntroduction: createAboutUsIntroductionDetailModel(aboutUsIntroductionResponseDtos),
+  courses: catalogItemResponseDtos
+    .filter((dto) => dto.type === CatalogItemType.Course)
+    .map(createCatalogItemBasicModel),
+  services: catalogItemResponseDtos
+    .filter((dto) => dto.type === CatalogItemType.Service)
+    .map(createCatalogItemBasicModel),
+  products: catalogItemResponseDtos
+    .filter((dto) => dto.type === CatalogItemType.Product)
+    .map(createCatalogItemBasicModel),
+};
 ---
 
+<PublicLayout pageTitle="Trang chủ">
+  <div class="container-fluid p-0" id="home-view">
+    <SliderItemList model={model.sliderItems} />
+
+    {/* ApplicationName */}
+    <div
+      class={joinHTMLClass(
+        "container-fluid text-center text-white fw-bold",
+        "p-2 mb-3 shadow application-name-container"
+      )}
+    >
+      {Astro.locals.generalSettings.applicationName}
+    </div>
+
+    <SummaryItemList model={model.summaryItems} />
+
+    {/* AboutUsIntroduction */}
+    <div class="container-fluid bg-success text-white shadow p-0">
+      <div class="container p-0">
+        <div class="row g-0 p-3 justify-content-center align-items-stretch">
+          <div class="col col-xl-6 col-lg-8 col-12 d-flex align-items-start m-3">
+            <img
+              src={model.aboutUsIntroduction.thumbnailUrl}
+              class="w-100 rounded-3"
+              alt="Về chúng tôi"
+            />
+          </div>
+
+          <div
+            class={joinHTMLClass(
+              "col-xl col-lg-8 col d-flex flex-column",
+              "justify-content-center align-items-start m-3"
+            )}
+          >
+            <div class="fs-2 mb-3">Về chúng tôi</div>
+            <p>{model.aboutUsIntroduction.aboutUsContent}</p>
+            <a
+              href={model.aboutUsIntroduction.publicDetailRoutePath}
+              class="btn btn-outline-light mt-3"
+            >
+              Tìm hiểu thêm
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* CatalogItems */}
+    <div class="container mt-3" id="catalog-item-container">
+      <CatalogItemList model={model.services} type={CatalogItemType.Service} />
+      <CatalogItemList model={model.courses} type={CatalogItemType.Course} />
+      <CatalogItemList model={model.products} type={CatalogItemType.Product} />
+    </div>
+
+    {/* Enquiry */}
+    <EnquiryForm />
+  </div>
+</PublicLayout>
+
+<style>
+  .application-name-container {
+    background-color: rgb(20, 112, 70);
+    font-size: 1.4em;
+  }
+
+  .summary-item-link {
+    color: unset;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .summary-item-thumbnail {
+    width: 150px;
+    height: 150px;
+    aspect-ratio: 1;
+  }
+
+  .catalog-item-thumbnail {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    object-position: 50% 50%;
+  }
+
+  @media (max-width: 576px) {
+    .application-name-container {
+      font-size: 1em;
+    }
+  }
+</style>

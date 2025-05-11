@@ -1,6 +1,5 @@
 ---
-import { getAboutUsIntroductionAsync } from "@/services/aboutUsIntroductionService";
-import { updateAboutUsIntroductionAsync } from "@/services/aboutUsIntroductionService";
+import { useAboutUsIntroductionService } from "@/services/aboutUsIntroductionService";
 import { createAboutUsIntroductionUpdateModel } from "@/models/aboutUsIntroductionModels";
 import { useDisplayNames } from "@/localization/displayNames";
 import { ValidationError } from "@/errors";
@@ -15,10 +14,11 @@ import TextAreaInput from "@/components/form/TextAreaInput.astro";
 import ThumbnailInput from "@/components/form/ThumbnailInput.astro";
 
 // Dependencies.
+const service = useAboutUsIntroductionService();
 const displayNames = useDisplayNames();
 
 // Model and states.
-const responseDto = await getAboutUsIntroductionAsync();
+const responseDto = await service.getAsync();
 const model = createAboutUsIntroductionUpdateModel(responseDto);
 const pageTitle = "Chỉnh sửa nội dung về chúng tôi";
 
@@ -26,8 +26,8 @@ if (Astro.request.method.toLowerCase() === "post") {
   try {
     model.parseFromForm(await Astro.request.formData());
     const requestDto = model.toRequestDto();
-    await updateAboutUsIntroductionAsync(requestDto);
-    return Astro.redirect(model.detailRoutePath());
+    await service.updateAsync(requestDto);
+    return Astro.redirect(model.protectedDetailRoutePath());
   } catch (error) {
     if (error instanceof ValidationError) {
       console.log(error);

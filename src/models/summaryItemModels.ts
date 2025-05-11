@@ -3,20 +3,22 @@ import { useErrorMessages } from "@/errors";
 import { useDisplayNames } from "@/localization/displayNames";
 import { useFormDataUtils } from "@/utils/formDataUtils";
 import { useRouteUtils } from "@/utils/routeUtils";
+import { usePhotoUtils } from "@/utils/photoUtils";
 import { ValidationError } from "@/errors";
 
 const errorMessages = useErrorMessages();
 const displayNames = useDisplayNames();
 const formDataUtils = useFormDataUtils();
 const routeUtils = useRouteUtils();
+const photoUtils = usePhotoUtils();
 
 declare global {
   type SummaryItemBasicModel = {
     id: number;
     name: string;
     summaryContent: string;
-    thumbnailUrl: string | null;
-    get publicRoutePath(): string;
+    thumbnailUrl: string;
+    get publicDetailRoutePath(): string;
     get protectedDetailRoutePath(): string;
     get protectedUpdateRoutePath(): string;
   };
@@ -59,8 +61,8 @@ function createBasic(responseDto: SummaryItemBasicResponseDto): SummaryItemBasic
     id: responseDto.id,
     name: responseDto.name,
     summaryContent: responseDto.summaryContent,
-    thumbnailUrl: responseDto.thumbnailUrl,
-    get publicRoutePath(): string {
+    thumbnailUrl: responseDto.thumbnailUrl ?? photoUtils.getDefaultPhotoUrl(),
+    get publicDetailRoutePath(): string {
       return routeUtils.getPublicSummaryItemsRoutePath(this.id);
     },
     get protectedDetailRoutePath(): string {

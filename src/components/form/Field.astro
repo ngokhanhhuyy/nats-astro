@@ -27,7 +27,7 @@ const validationMessageClass = compute<string>(() => {
   {props.floating ? (
     <div class="form-floating">
       <slot />
-      <label class="form-label fw-bold small">{props.displayName}</label>
+      <label class="form-label small">{props.displayName}</label>
     </div>
   ) : (
     <label class="form-label fw-bold small m-0 regular-label">{props.displayName}</label>

@@ -1,0 +1,49 @@
+---
+import { useHTMLUtils } from "@/utils/htmlUtils";
+
+// Props.
+type Props = { model: SummaryItemBasicModel[] };
+
+// Dependencies.
+const { joinHTMLClass } = useHTMLUtils();
+---
+
+<div class="container">
+  <div class="row g-3 p-3">
+    {Astro.props.model.map((summaryItem) => (
+      <a
+        href={summaryItem.publicDetailRoutePath}
+        class={joinHTMLClass(
+          "col col-xl-3 col-md-6 col-12 p-3 summary-item-link",
+          "d-flex flex-column align-items-center"
+        )}
+      >
+        <img
+          class="rounded-circle summary-item-thumbnail mb-3 shadow"
+          src={summaryItem.thumbnailUrl}
+          alt={summaryItem.name}
+        />
+
+        <span class="fs-3 text-center text-success mb-3">
+          {summaryItem.name}
+        </span>
+
+        <p>{summaryItem.summaryContent}</p>
+      </a>
+    ))}
+  </div>
+</div>
+
+<style>
+  .summary-item-link {
+    color: unset;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .summary-item-thumbnail {
+    width: 150px;
+    height: 150px;
+    aspect-ratio: 1;
+  }
+</style>

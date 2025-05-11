@@ -21,6 +21,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
   context.locals.contacts = (await contactService.getListAsync())
     .map(createContactDetailModel);
 
+  
+
   // Verify jwt token.
   const token = context.cookies.get("Authorization");
   if (token) {

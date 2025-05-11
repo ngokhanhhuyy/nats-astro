@@ -1,0 +1,85 @@
+---
+import { CatalogItemType } from "@/enums/catalogItemType";
+import { useDisplayNames } from "@/localization/displayNames";
+import { useHTMLUtils } from "@/utils/htmlUtils";
+
+// Props.
+type Props = { model: CatalogItemBasicModel[]; type: CatalogItemType };
+
+// Dependencies.
+const displayNames = useDisplayNames();
+const { compute, joinHTMLClass } = useHTMLUtils();
+
+// Computed.
+const title = compute<string>(() => {
+  switch (Astro.props.type) {
+    case CatalogItemType.Course:
+      return displayNames.course;
+    case CatalogItemType.Service:
+      return displayNames.service;
+    case CatalogItemType.Product:
+      return displayNames.product;
+    default:
+      throw new Error("NotImplemented");
+  }
+});
+---
+{Astro.props.model.length > 0 && (
+  <div class="row g-3 p-3 align-items-stretch catalog-items-row">
+    <div class="col col-12 text-center">
+      <h2 class="text-success fw-normal">{title}</h2>
+    </div>
+  
+    {Astro.props.model.map((catalogItem) => (
+      <div
+        class={joinHTMLClass(
+          "col col-xl-3 col-lg-4 col-md-6 col-sm-10 col-10",
+          "justify-self-md-start justify-self-sm-center"
+        )}
+      >
+        <div class="card h-100 shadow-sm">
+          <img
+            src={catalogItem.thumbnailUrl}
+            class="card-img-top"
+            alt={catalogItem.name}
+          />
+  
+          <div
+            class={joinHTMLClass(
+              "card-body d-flex flex-column flex-fill",
+              "justify-content-between align-items-start"
+            )}
+          >
+            <span class="card-title fw-bold">{catalogItem.name.toUpperCase()}</span>
+  
+            <a href={catalogItem.publicDetailRoutePath} class="btn btn-outline-success mt-2">
+              Chi tiết
+            </a>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+)}
+
+<style>
+  .card-img-top {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    object-position: 50% 50%;
+}
+
+@media (max-width: 768px) {
+  .row {
+    width: fit-content !important;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .row {
+    width: 100%;
+  }
+}
+</style>
