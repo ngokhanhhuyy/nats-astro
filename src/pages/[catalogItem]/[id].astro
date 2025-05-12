@@ -1,0 +1,170 @@
+---
+import {
+  createCatalogItemBasicModel,
+  createCatalogItemDetailModel } from "@/models/catalogItemModels";
+import { useDisplayNames } from "@/localization/displayNames";
+import { useRouteUtils } from "@/utils/routeUtils";
+import { useHTMLUtils } from "@/utils/htmlUtils";
+import { NotFoundError } from "@/errors";
+
+// Layout component.
+import PublicSubPageLayout from "@/layouts/public/PublicSubPageLayout.astro";
+import { CatalogItemType } from "@/enums/catalogItemType";
+
+// Dependencies.
+const displayNames = useDisplayNames();
+const routeUtils = useRouteUtils();
+const { compute } = useHTMLUtils();
+
+// Model.
+const type = computeTypeByParamValue();
+if (!type) {
+  return Astro.redirect(routeUtils.getPublicHomeRoutePath());
+}
+
+const id = parseInt(Astro.params.id as string);
+if (isNaN(id)) {
+  return Astro.redirect(routeUtils.getPublicHomeRoutePath());
+}
+
+let detailModel: CatalogItemDetailModel;
+let otherItemModels: CatalogItemBasicModel[];
+try {
+  const detailResponseDto = await Astro.locals.services.catalogItemService.getDetailAsync(id);
+  if (detailResponseDto.type !== type) {
+    return Astro.redirect(routeUtils.getPublicHomeRoutePath());
+  }
+
+  detailModel = createCatalogItemDetailModel(detailResponseDto);
+  
+  const otherItemResponseDtos = await Astro.locals.services.catalogItemService.getListAsync({
+    type: detailResponseDto.type
+  });
+  
+  otherItemModels = otherItemResponseDtos
+    .filter(dto => dto.id !== detailResponseDto.id)
+    .sort(() => Math.random() - Math.random())
+    .slice(0, 4)
+    .map(dto => createCatalogItemBasicModel(dto));
+} catch (error) {
+  if (error instanceof NotFoundError) {
+    return Astro.redirect(routeUtils.getPublicHomeRoutePath());
+  }
+
+  throw error; 
+}
+
+// Computed.
+const typeDisplayName = compute<string>(() => {
+  const displayNamesByType = {
+    [CatalogItemType.Service]: displayNames.service,
+    [CatalogItemType.Course]: displayNames.course,
+    [CatalogItemType.Product]: displayNames.product
+  }
+
+  return displayNamesByType[detailModel.type];
+});
+
+function computeTypeByParamValue(): CatalogItemType | null {
+  if (!Astro.params.catalogItem) {
+    return null;
+  }
+
+  const paramValuesByType = {
+    "dich-vu": CatalogItemType.Service,
+    "khoa-hoc": CatalogItemType.Course,
+    "san-pham": CatalogItemType.Product
+  };
+
+  if (!Object.keys(paramValuesByType).includes(Astro.params.catalogItem)) {
+    return null;
+  }
+
+  return paramValuesByType[Astro.params.catalogItem as keyof typeof paramValuesByType];
+}
+---
+
+<PublicSubPageLayout pageTitle={detailModel.name}>
+  <div class="container-fluid p-0">
+    <div class="container p-4">
+      <div class="row g-4 justify-content-center">
+        {/* Name and summary */}
+        <div class="col col-md-10 col-12">
+          {/* Name */} 
+          <h2 class="text-success">
+            {detailModel.name}
+          </h2>
+
+          {/* Summary */}
+          <span class="d-inline-block my-2">
+            {detailModel.summary}
+          </span>
+        </div>
+
+        {/* Thumbnail */}
+        <div class="col col-xl-4 col-md-5 col-10">
+          {detailModel.thumbnailUrl != null && (
+            <img
+              src={detailModel.thumbnailUrl}
+              class="w-100 img-thumbnail rounded-4 shadow"
+              alt={detailModel.name}
+            />
+          )}
+        </div>
+
+        {/* Detail */}
+        <div class="col col-sm-10 col-12 pt-4">
+          {detailModel.detail}
+        </div>
+      </div>
+    </div>
+
+    {/* EnquiryLink */}
+    <div class="container-fluid py-5 bg-success text-white mt-5">
+      <div class="container d-flex flex-column justify-content-center align-items-center">
+        <span class="fs-1 text-center">
+          Hãy để chúng tôi tư vấn cho bạn!
+        </span>
+        <a href="#" class="btn btn-outline-light btn-lg mt-3">
+          Liên hệ
+        </a>
+      </div>
+    </div>
+
+    {/* OtherItems */}
+    <div class="container my-5">
+      <div class="row g-4 justify-content-center align-items-stretch">
+        <div class="col col-md-10 col-12 fs-2 text-success">
+          {typeDisplayName} khác
+        </div>
+
+        {otherItemModels.map((item) => (
+          <div class="col col-xl-3 col-sm-5 col-10">
+            <div class="card w-100 h-100">
+              <img src={item.thumbnailUrl} class="card-img-top" alt={item.name} />
+              <div class="card-body d-flex flex-column justify-content-start">
+                {/* Name */}
+                <h5 class="card-title text-success">
+                  {item.name}
+                </h5>
+
+                {/* Summary */}
+                <div class="card-text d-block flex-fill">
+                  {item.summary}
+                </div>
+
+                {/* DetailLink */}
+                <a
+                  href={item.publicDetailRoutePath}
+                  class="btn btn-outline-success align-self-end mt-3"
+                >
+                  Chi tiết
+                </a>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</PublicSubPageLayout>

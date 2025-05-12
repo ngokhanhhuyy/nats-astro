@@ -10,7 +10,7 @@ export function useMemberService(prisma: PrismaClient) {
      * Gets a list of all members.
      * 
      * @returns A {@link Promise} representing the asynchronous operation, which result is an
-     * array of DTOs, containing the information of the slider items.
+     * array of DTOs, containing the information of the members.
      */
     async getListAsync(): Promise<MemberDetailResponseDto[]> {
       const members = await prisma.member.findMany();

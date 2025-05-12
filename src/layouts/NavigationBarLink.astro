@@ -13,7 +13,7 @@ const computedClassName = compute<string | undefined>(() => {
     return "active";
   }
 
-  if (Astro.url.pathname !== "/" && Astro.url.pathname.startsWith(Astro.props.href)) {
+  if (Astro.props.href !== "/" && Astro.url.pathname.startsWith(Astro.props.href)) {
     return "active";
   }
 

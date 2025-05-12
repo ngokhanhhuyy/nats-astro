@@ -1,0 +1,166 @@
+---
+import { createAboutUsIntroductionDetailModel } from "@/models/aboutUsIntroductionModels";
+import { createMemberDetailModel } from "@/models/memberModels";
+import { createCertificateDetailModel } from "@/models/certificateModels";
+import { useDisplayNames } from "@/localization/displayNames";
+import { useHTMLUtils } from "@/utils/htmlUtils";
+import { usePhotoUtils } from "@/utils/photoUtils";
+import { EOL } from "os";
+
+// Layout component.
+import PublicSubPageLayout from "@/layouts/public/PublicSubPageLayout.astro";
+
+// Dependencies.
+const displayNames = useDisplayNames();
+const { compute, joinHTMLClass } = useHTMLUtils();
+const photoUtils = usePhotoUtils();
+
+// Model.
+const [
+  aboutUsIntroductionResponseDto,
+  memberResponseDtos,
+  certificateResponseDtos
+] = await Promise.all([
+  Astro.locals.services.aboutUsIntroductionService.getAsync(),
+  Astro.locals.services.memberService.getListAsync(),
+  Astro.locals.services.certificateService.getListAsync()
+]);
+
+const model = {
+  aboutUsIntroduction: createAboutUsIntroductionDetailModel(aboutUsIntroductionResponseDto),
+  members: memberResponseDtos.map(dto => createMemberDetailModel(dto)),
+  certificates: certificateResponseDtos.map(dto => createCertificateDetailModel(dto))
+};
+
+// Computed.
+const contentItems = compute<{ title: string; content: string; }[]>(() => {
+  return [
+    {
+      title: displayNames.aboutUs,
+      content: model.aboutUsIntroduction.aboutUsContent
+    },
+    {
+      title: displayNames.whyChooseUs,
+      content: model.aboutUsIntroduction.whyChooseUsContent
+    },
+    {
+      title: displayNames.ourDifference,
+      content: model.aboutUsIntroduction.ourDifferenceContent
+    },
+    {
+      title: displayNames.ourCulture,
+      content: model.aboutUsIntroduction.ourCultureContent
+    }
+  ];
+});
+---
+
+<PublicSubPageLayout pageTitle="Về chúng tôi">
+  <div class="container p-4" id="about-us-view">
+    {/* Thumbnail */}
+    <div class="row justify-content-center px-3 py-3 mb-4">
+      <div class="col col-xl-6 col-lg-7 col-md-8 col-12 order-lg-0 order-1">
+        <img
+          src={model.aboutUsIntroduction.thumbnailUrl ?? photoUtils.getDefaultPhotoUrl()}
+          class="w-100 rounded-4 shadow"
+          alt="Về chúng tôi"
+        />
+      </div>
+    </div>
+
+    {/* Content */}
+    <div class="row gx-5 gy-3 justify-content-center">
+      {contentItems.map((item) => (
+        <div class="col col-lg-6 col-md-10 col-12">
+          <h2 class="text-success text-center fw-normal mb-3">
+              {item.title}
+          </h2>
+
+          {item.content.split(EOL).map((paragraph) => (
+            <p>{paragraph}</p>
+          ))}
+        </div>
+      ))}
+    </div>
+      
+    {/* Members */}
+    <div class="row gx-5 gy-3 justify-content-center mt-2">
+      <div class="col col-lg-12 col-md-10 col-12">
+        <h2 class="text-success text-center fw-normal">
+          Đội ngũ của chúng tôi
+        </h2>
+      </div>
+
+      {model.members.map((member) => (
+        <div
+          class={joinHTMLClass(
+            "col col-xl-5 col-lg-6 col-md-8 col-sm-10 col-12",
+            "d-flex flex-column align-items-center"
+          )}
+        >
+          <img
+            src={member.thumbnailUrl}
+            class="member-thumbnail rounded-circle shadow flex-shrink-0 mb-3"
+            alt={member.fullName}
+          />
+
+          {/* FullName */}
+          <span
+            class={joinHTMLClass(
+              "fs-4 fw-bold bg-success-subtle border border-success-subtle",
+              "rounded text-success px-2 text-success"
+            )}
+          >
+            {member.fullName}
+          </span>
+
+          {/* RoleName */}
+          <span class="my-2 text-success">
+            {member.roleName}
+          </span>
+
+          {/* Description */}
+          {member.description.split(EOL).map((paragraph) => <p>{paragraph}</p>)}
+        </div>
+      ))}
+    </div>
+  
+    {/* Certificates */}
+    <div class="row gx-5 gy-3 justify-content-center my-2">
+      <div class="col col-md-10 col-12">
+        <h2 class="text-success text-center fw-normal">
+          Chứng chỉ
+        </h2>
+      </div>
+
+      {model.certificates.map((certificate) => (
+        <div class="col col-xl-5 col-md-10 col-12">
+          <div class="d-flex flex-column justify-content-stretch align-items-stretch">
+            <img
+              class="rounded-top-3 shadow"
+              src={certificate.thumbnailUrl}
+              alt={certificate.name}
+            />
+            
+            <div
+              class={joinHTMLClass(
+                "bg-success-subtle text-center text-success border",
+                "border-success fs-5 fw-bold px-3 py-2 shadow rounded-bottom-3"
+              )}
+            >
+              {certificate.name}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</PublicSubPageLayout>
+
+<style>
+  .member-thumbnail {
+    width: 150px;
+    height: auto;
+    aspect-ratio: 1;
+  }
+</style>

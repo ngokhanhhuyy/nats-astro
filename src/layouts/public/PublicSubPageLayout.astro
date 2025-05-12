@@ -17,18 +17,29 @@ const routeUtils = useRouteUtils();
 
 // Computed.
 const isEnquiryFormVisible = compute<boolean>(() => {
-  return Astro.url.pathname === routeUtils.getPublicEnquiryRoutePath();
+  return Astro.url.pathname !== routeUtils.getPublicEnquiryRoutePath();
 });
 ---
 
-<div class="container-fluid bg-success-subtle text-white border-bottom border-success p-5">
-  <div class="container p-3">
-    <span class="fs-1">{Astro.props.pageTitle}</span>
+<PublicLayout pageTitle={Astro.props.pageTitle}>
+  <div class="container-fluid bg-success-subtle text-white border-bottom border-success p-5">
+    <div class="container p-3">
+      <span class="fs-1">{Astro.props.pageTitle}</span>
+    </div>
   </div>
-</div>
 
-<slot />
+  <slot />
 
-{isEnquiryFormVisible && (
-  <EnquiryForm />
-)}
+  {isEnquiryFormVisible && <EnquiryForm />}
+</PublicLayout>
+
+<style>
+  .container-fluid {
+    background-image:
+      linear-gradient(
+        to right,
+        rgba(var(--bs-success-rgb), 0.85) 0%,
+        rgba(var(--bs-success-rgb), 0.85) 100%),
+      url("images/front-pages/sub-page-title-container-background.webp");
+  }
+</style>

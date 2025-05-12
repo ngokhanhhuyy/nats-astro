@@ -1,14 +1,14 @@
 import type { Certificate } from "@prisma/client";
 
 declare global {
-  type CertificateResponseDto = {
+  type CertificateDetailResponseDto = {
     id: number;
     name: string | null;
     thumbnailUrl: string;
   };
 }
 
-function createCertificateResponseDto(certificate: Certificate): CertificateResponseDto {
+function createDetail(certificate: Certificate): CertificateDetailResponseDto {
   return {
     id: certificate.id,
     name: certificate.name,
@@ -16,4 +16,4 @@ function createCertificateResponseDto(certificate: Certificate): CertificateResp
   }
 }
 
-export { createCertificateResponseDto };
+export { createDetail as createCertificateDetailResponseDto };

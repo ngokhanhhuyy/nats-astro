@@ -1,0 +1,111 @@
+---
+import { createSummaryItemDetailModel } from "@/models/summaryItemModels";
+import { useHTMLUtils } from "@/utils/htmlUtils";
+import { EOL } from "os";
+
+// Layout component.
+import PublicSubPageLayout from "@/layouts/public/PublicSubPageLayout.astro";
+
+// Dependencies.
+const { compute, joinHTMLClass } = useHTMLUtils();
+
+// Model.
+const responseDtos = await Astro.locals.services.summaryItemService.getDetailListAsync();
+const model = responseDtos.map(dto => createSummaryItemDetailModel(dto));
+const focusedId = computeFocusedId();
+
+// Computed.
+function computeFocusedId(): number | null {
+  const idAsString = Astro.url.searchParams.get("id");
+  if (!idAsString) {
+    return null;
+  }
+  
+  const id = parseInt(idAsString);
+  if (model.map(summaryItem => summaryItem.id).includes(id)) {
+    return null;
+  }
+
+  return id;
+}
+---
+
+<PublicSubPageLayout pageTitle="Giới thiệu">
+  <div class="container p-4 mt-4" id="summary-item-view">
+    {model.map((summaryItem, index) => (
+      <div class={joinHTMLClass(
+        "row g-5 justify-content-center mb-5 item-row",
+        summaryItem.id === focusedId && "focused"
+      )}>
+        {/* Thumbnail */}
+        <div class={joinHTMLClass(
+          "col col-lg-auto col-md-11 col-12 d-flex justify-content-center align-items-start",
+          `order-lg-${index % 2}`
+        )}>
+          <img
+            src={summaryItem.thumbnailUrl}
+            class="rounded-circle shadow"
+            alt={summaryItem.name}
+          />
+        </div>
+
+        <div class={`col col-lg col-md-10 col-12 text-center order-lg-${(index + 1) % 2}`}>
+          {/* Name */}
+          <div class={joinHTMLClass(
+            "fs-2 text-success mb-3 text-center",
+            index % 2 === 0 ? "text-lg-start" : "text-lg-end"
+          )}>
+            {summaryItem.name}
+          </div>
+
+          {/* DetailContent */}
+          {summaryItem.detailContent.split(EOL).map((paragraph) => <p>{paragraph}</p>)}
+        </div>
+      </div>
+    ))}
+  </div>
+</PublicSubPageLayout>
+
+<style>
+  img {
+    width: 250px;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    object-position: 50%;
+  }
+  
+  .item-row {
+    border-radius: 1rem;
+    border: 1px solid transparent;
+    scroll-margin-top: 2rem;
+  }
+  
+  .item-row.focused {
+    transform-origin: 50% 50%;
+    animation-name: focus-animation;
+    animation-iteration-count: 5;
+    animation-duration: .5s;
+  }
+  
+  @keyframes focus-animation {
+    0% {
+      transform: scale(100%);
+    }
+    
+    50% {
+      transform: scale(102%);
+    }
+    
+    100% {
+      transform: scale(100%);
+    }
+  }
+</style>
+
+<script>
+  const focusedItemRowElement = document.querySelector(".item-row.focused");
+  if (focusedItemRowElement) {
+    focusedItemRowElement.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+</script>

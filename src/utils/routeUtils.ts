@@ -45,11 +45,13 @@ const routeUtils = {
 
   // Protected - member route paths.
   getProtectedMemberListRoutePath : () => "/quan-tri/doi-ngu",
+  getProtectedMemberDetailRoutePath: (id: number) => `/quan-tri/doi-ngu/${id}`,
   getProtectedMemberCreateRoutePath : () => "/quan-tri/doi-ngu/tao-moi",
   getProtectedMemberUpdateRoutePath: (id: number) => `/quan-tri/doi-ngu/${id}/chinh-sua`,
 
   // Protected - certificate route paths.
   getProtectedCertificateListRoutePath : () => "/quan-tri/chung-chi",
+  getProtectedCertificateDetailRoutePath: (id: number) => `/quan-tri/chung-chi/${id}`,
   getProtectedCertificateCreateRoutePath : () => "/quan-tri/chung-chi/tao-moi",
   getProtectedCertificateUpdateRoutePath: (id: number) => {
     return `/quan-tri/chung-chi/${id}/chinh-sua`;

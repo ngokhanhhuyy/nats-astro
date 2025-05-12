@@ -52,7 +52,7 @@ const computedClass = compute<string | undefined>(() => {
   data-bs-theme="light"
 >
   <div class="container-sm d-flex justify-content-between">
-    <!-- Main logo -->
+    {/* Main logo */}
     <a
       href={routeUtils.getPublicHomeRoutePath()}
       class="navbar-brand d-flex align-items-center"
@@ -68,64 +68,62 @@ const computedClass = compute<string | undefined>(() => {
       </span>
     </a>
 
-    <!-- NavigationButtonInSmallScreens -->
-    {
-      !Astro.url.pathname.startsWith(routeUtils.getSignInRoutePath()) && (
-        <>
-          <button
-            class="navbar-toggler fs-3 me-2"
-            type="button"
-            data-bs-toggle="offcanvas"
-            data-bs-target="#navbar-content"
-            aria-controls="navbar-content"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <i class="bi bi-list" />
-          </button>
+    {/* NavigationButtonInSmallScreens */}
+    {!Astro.url.pathname.startsWith(routeUtils.getSignInRoutePath()) && (
+      <>
+        <button
+          class="navbar-toggler fs-3 me-2"
+          type="button"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#navbar-content"
+          aria-controls="navbar-content"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <i class="bi bi-list" />
+        </button>
 
-          <div
-            class="offcanvas offcanvas-end"
-            tabindex="-1"
-            id="navbar-content"
-            aria-labelledby="offcanvasNavbarLabel"
-          >
-            <div class="offcanvas-header">
-              <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
-                Điều hướng
-              </h5>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="offcanvas"
-                aria-label="Close"
-              />
-            </div>
-
-            <div class="offcanvas-body">
-              <ul class="navbar-nav me-auto justify-content-end w-100">
-                {routeItems.map((item) => (
-                  <li class="nav-item">
-                    <Link href={item.to}>{item.text}</Link>
-                  </li>
-                ))}
-
-                {isAdminRoute && (
-                  <li class="nav-item">
-                    {/* <SignOutLink /> */}
-                    <form action={routeUtils.getSignOutRoutePath()} method="POST">
-                      <button type="submit" class="nav-link" id="signOutLink">
-                        Đăng xuất
-                      </button>
-                    </form>
-                  </li>
-                )}
-              </ul>
-            </div>
+        <div
+          class="offcanvas offcanvas-end"
+          tabindex="-1"
+          id="navbar-content"
+          aria-labelledby="offcanvasNavbarLabel"
+        >
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+              Điều hướng
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="offcanvas"
+              aria-label="Close"
+            />
           </div>
-        </>
-      )
-    }
+
+          <div class="offcanvas-body">
+            <ul class="navbar-nav me-auto justify-content-end w-100">
+              {routeItems.map((item) => (
+                <li class="nav-item">
+                  <Link href={item.to}>{item.text}</Link>
+                </li>
+              ))}
+
+              {isAdminRoute && (
+                <li class="nav-item">
+                  {/* <SignOutLink /> */}
+                  <form action={routeUtils.getSignOutRoutePath()} method="POST">
+                    <button type="submit" class="nav-link" id="signOutLink">
+                      Đăng xuất
+                    </button>
+                  </form>
+                </li>
+              )}
+            </ul>
+          </div>
+        </div>
+      </>
+    )}
   </div>
 </nav>
 
@@ -204,7 +202,7 @@ const computedClass = compute<string | undefined>(() => {
     .offcanvas-body {
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: start;
     }
   }
 </style>

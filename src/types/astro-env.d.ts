@@ -1,16 +1,5 @@
 /// <reference types="astro/types" />
 
-import type { AboutUsIntroductionService } from "@/services/aboutUsIntroductionService";
-import type { AuthenticationService } from "@/services/authenticationService";
-import type { CatalogItemService } from "@/services/catalogItemService";
-import type { CertificateService } from "@/services/certificateService";
-import type { ContactService } from "@/services/contactService";
-import type { GeneralSettingsService } from "@/services/generalSettingsService";
-import type { MemberService } from "@/services/memberService";
-import type { SliderItemService } from "@/services/sliderItemService";
-import type { SummaryItemService } from "@/services/summaryItemService";
-import type { UserService } from "@/services/userService";
-
 declare namespace App {
   interface Locals {
     modelErrorMessagesStore: import("@/utils/modelErrorUtils").IModelErrorMessagesStore;
@@ -18,17 +7,16 @@ declare namespace App {
     generalSettings: GeneralSettingsDetailModel;
     contacts: ContactDetailModel[];
     services: {
-      aboutUsIntroductionService: import("@/services/aboutUsIntroductionService")
-        .AboutUsIntroductionService,
-      authenticationService: AuthenticationService;
-      catalogItemService: CatalogItemService,
-      certificateService: CertificateService,
-      contactService: ContactService,
-      generalSetttingsService: GeneralSettingsService,
-      memberService: MemberService,
-      sliderItemService: SliderItemService,
-      summaryItemService: SummaryItemService,
-      userService: UserService
+      aboutUsIntroductionService: import("@/services/aboutUsIntroductionService").AboutUsIntroductionService;
+      authenticationService: import("@/services/authenticationService").AuthenticationService;
+      catalogItemService: import("@/services/catalogItemService").CatalogItemService;
+      certificateService: import("@/services/certificateService").CertificateService;
+      contactService: import("@/services/contactService").ContactService;
+      generalSettingsService: import("@/services/generalSettingsService").GeneralSettingsService;
+      memberService: import("@/services/memberService").MemberService,
+      sliderItemService: import("@/services/sliderItemService").SliderItemService,
+      summaryItemService: import("@/services/summaryItemService").SummaryItemService,
+      userService: import("@/services/userService").UserService
     }
   }
 }

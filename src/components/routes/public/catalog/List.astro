@@ -1,0 +1,103 @@
+---
+import { createCatalogItemBasicModel } from "@/models/catalogItemModels";
+import { CatalogItemType } from "@/enums/catalogItemType";
+import { useDisplayNames } from "@/localization/displayNames";
+import { useHTMLUtils } from "@/utils/htmlUtils";
+
+// Layout component.
+import PublicSubPageLayout from "@/layouts/public/PublicSubPageLayout.astro";
+
+// Props.
+type Props = { type: CatalogItemType };
+
+// Dependencies.
+const { compute, joinHTMLClass } = useHTMLUtils();
+const displayNames = useDisplayNames();
+
+// Model.
+const responseDtos = await Astro.locals.services.catalogItemService.getListAsync({
+  type: Astro.props.type
+});
+const model = responseDtos.map(dto => createCatalogItemBasicModel(dto));
+
+// Computed.
+const pageTitle = compute<string>(() => {
+  const titlesByType = {
+    [CatalogItemType.Service]: displayNames.service,
+    [CatalogItemType.Course]: displayNames.course,
+    [CatalogItemType.Product]: displayNames.product
+  };
+
+  return titlesByType[Astro.props.type];
+});
+---
+
+<PublicSubPageLayout pageTitle={pageTitle}>
+  {model.length > 0 ? (
+    <div class="container h-100" id="catalog-item-list-view">
+      <div class="row g-3 px-3 py-4 catalog-items-row">
+        {model.map((catalogItem) => (
+          <div class={joinHTMLClass(
+            "col col-xl-3 col-lg-4 col-md-6 col-sm-10 col-10",
+            "justify-self-md-start justify-self-sm-center"
+          )}>
+            <div class="card h-100 shadow-sm">
+              {/* Thumbnail */}
+              <img
+                src={catalogItem.thumbnailUrl}
+                class="card-img-top catalog-item-thumbnail"
+                alt={catalogItem.name}
+              />
+
+              <div class={joinHTMLClass(
+                "card-body d-flex flex-column flex-fill",
+                "justify-content-between align-items-start"
+              )}>
+                {/* Title */}
+                <a href={catalogItem.publicDetailRoutePath} class="card-title fs-5">
+                  {catalogItem.name}
+                </a>
+
+                {/* Summary */}
+                <span>{catalogItem.summary}</span>
+
+                {/* LinkToDetail */}
+                <a
+                  href={catalogItem.publicDetailRoutePath}
+                  class="btn btn-outline-success mt-2"
+                >
+                  Chi tiết
+                </a>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  ) : (
+    <div class="d-flex justify-content-center align-items-center p-5 m-5 fs-5">
+      <span class="opacity-75">Không có {pageTitle.toLowerCase()} nào</span>
+    </div>
+  )}
+</PublicSubPageLayout>
+
+<style>
+  .card-title {
+    color: var(--bs-success);
+    font-weight: bold;
+    text-decoration: none;
+  }
+  
+  @media (max-width: 768px) {
+    .catalog-items-row.row {
+      width: fit-content !important;
+      justify-content: center;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .catalog-items-row.row {
+      width: 100%;
+    }
+  }
+</style>

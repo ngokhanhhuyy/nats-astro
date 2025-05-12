@@ -1,5 +1,5 @@
 import { Prisma, type PrismaClient } from "@prisma/client";
-import { createMemberDetailResponseDto } from "@/dtos/member/memberResponseDtos";
+import { createCertificateDetailResponseDto } from "@/dtos/certificate/certificateResponseDtos";
 import { usePrismaClientErrorHandler, NotFoundError } from "@/errors";
 
 const prismaClientErrorHandler = usePrismaClientErrorHandler();
@@ -7,71 +7,69 @@ const prismaClientErrorHandler = usePrismaClientErrorHandler();
 export function useCertificateService(prisma: PrismaClient) {
   return {
     /**
-     * Gets a list of all members.
+     * Gets a list of all certificates.
      * 
      * @returns A {@link Promise} representing the asynchronous operation, which result is an
-     * array of DTOs, containing the information of the slider items.
+     * array of DTOs, containing the information of the certificates.
      */
-    async getListAsync(): Promise<MemberDetailResponseDto[]> {
-      const members = await prisma.member.findMany();
-      return members.map(member => createMemberDetailResponseDto(member));
+    async getListAsync(): Promise<CertificateDetailResponseDto[]> {
+      const certificates = await prisma.certificate.findMany();
+      return certificates.map(member => createCertificateDetailResponseDto(member));
     },
     
     /**
-     * Gets a single member by its id.
+     * Gets a single certificate by its id.
      * 
-     * @param id The id of the member to retrieve.
+     * @param id The id of the certificate to retrieve.
      * @returns A {@link Promise} representing the asynchronous operation, which result is a
-     * DTO containing the information of the member.
+     * DTO containing the information of the certificate.
      * 
-     * @throws {NotFoundError} Throws when the member specified by {@link id} doesn't exist.
+     * @throws {NotFoundError} Throws when the certificate specified by {@link id} doesn't
+     * exist.
      */
-    async getSingleAsync(id: number): Promise<MemberDetailResponseDto> {
-      const member = await prisma.member.findUnique({ where: { id } });
-      if (!member) {
+    async getSingleAsync(id: number): Promise<CertificateDetailResponseDto> {
+      const certificate = await prisma.certificate.findUnique({ where: { id } });
+      if (!certificate) {
         throw new NotFoundError();
       }
   
-      return createMemberDetailResponseDto(member);
+      return createCertificateDetailResponseDto(certificate);
     },
   
     /**
-     * Creates a new member.
+     * Creates a new certificate.
      * 
      * @param requestDto A DTO containing the data for the creating operation.
      * @returns A {@link Promise} representing the asynchronous operation, which result is the
-     * id of the created member.
+     * id of the created certificate.
      */
-    async createAsync(requestDto: MemberUpsertRequestDto): Promise<number> {
-      const member = await prisma.member.create({
+    async createAsync(requestDto: CertificateUpsertRequestDto): Promise<number> {
+      const certificate = await prisma.certificate.create({
         data: {
-          fullName: requestDto.fullName,
-          roleName: requestDto.roleName,
-          description: requestDto.description,
+          name: requestDto.name,
           thumbnailUrl: requestDto.thumbnailUrl
         }
       });
   
-      return member.id;
+      return certificate.id;
     },
   
     /**
-     * Updates an existing member, specified by its id.
+     * Updates an existing certificate, specified by its id.
      * 
-     * @param id The id of the member to update.
+     * @param id The id of the certificate to update.
      * @param requestDto A DTO containing the data for the updating operation.
      * @returns A {@link Promise} representing the asynchronous operation.
      * 
-     * @throws {NotFoundError} Throws when the member specified by {@link id} doesn't exist.
+     * @throws {NotFoundError} Throws when the certificate specified by {@link id} doesn't
+     * exist.
      */
-    async updateAsync(id: number, requestDto: MemberUpsertRequestDto): Promise<void> {
+    async updateAsync(id: number, requestDto: CertificateUpsertRequestDto): Promise<void> {
       try {
-        await prisma.member.update({
+        await prisma.certificate.update({
           where: { id },
           data: {
-            fullName: requestDto.fullName,
-            roleName: requestDto.roleName,
-            description: requestDto.description,
+            name: requestDto.name,
             thumbnailUrl: requestDto.thumbnailUrl
           }
         });
@@ -88,16 +86,17 @@ export function useCertificateService(prisma: PrismaClient) {
     },
   
     /**
-     * Deletes an existing member, specified by its id.
+     * Deletes an existing certificate, specified by its id.
      * 
      * @param id The id of the member to delete.
      * @returns A {@link Promise} representing the asynchronous operation.
      * 
-     * @throws {NotFoundError} Throws when the member specified by {@link id} doesn't exist.
+     * @throws {NotFoundError} Throws when the certificate specified by {@link id} doesn't
+     * exist.
      */
     async deleteAsync(id: number): Promise<void> {
       try {
-        await prisma.member.delete({ where: { id } });
+        await prisma.certificate.delete({ where: { id } });
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           const handledResult = prismaClientErrorHandler.handle(error);
