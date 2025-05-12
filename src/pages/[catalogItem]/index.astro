@@ -2,22 +2,24 @@
 import { createCatalogItemBasicModel } from "@/models/catalogItemModels";
 import { CatalogItemType } from "@/enums/catalogItemType";
 import { useDisplayNames } from "@/localization/displayNames";
+import { useRouteUtils } from "@/utils/routeUtils";
 import { useHTMLUtils } from "@/utils/htmlUtils";
 
 // Layout component.
 import PublicSubPageLayout from "@/layouts/public/PublicSubPageLayout.astro";
 
-// Props.
-type Props = { type: CatalogItemType };
-
 // Dependencies.
-const { compute, joinHTMLClass } = useHTMLUtils();
 const displayNames = useDisplayNames();
+const { compute, joinHTMLClass } = useHTMLUtils();
+const routeUtils = useRouteUtils();
 
 // Model.
-const responseDtos = await Astro.locals.services.catalogItemService.getListAsync({
-  type: Astro.props.type
-});
+const type = computeTypeByParamValue();
+if (!type) {
+  return Astro.redirect(routeUtils.getPublicHomeRoutePath());
+}
+
+const responseDtos = await Astro.locals.services.catalogItemService.getListAsync({ type });
 const model = responseDtos.map(dto => createCatalogItemBasicModel(dto));
 
 // Computed.
@@ -28,8 +30,26 @@ const pageTitle = compute<string>(() => {
     [CatalogItemType.Product]: displayNames.product
   };
 
-  return titlesByType[Astro.props.type];
+  return titlesByType[type];
 });
+
+function computeTypeByParamValue(): CatalogItemType | null {
+  if (!Astro.params.catalogItem) {
+    return null;
+  }
+
+  const paramValuesByType = {
+    "dich-vu": CatalogItemType.Service,
+    "khoa-hoc": CatalogItemType.Course,
+    "san-pham": CatalogItemType.Product
+  };
+
+  if (!Object.keys(paramValuesByType).includes(Astro.params.catalogItem)) {
+    return null;
+  }
+
+  return paramValuesByType[Astro.params.catalogItem as keyof typeof paramValuesByType];
+}
 ---
 
 <PublicSubPageLayout pageTitle={pageTitle}>

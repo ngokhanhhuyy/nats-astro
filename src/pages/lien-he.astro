@@ -1,0 +1,25 @@
+---
+import { ContactType } from "@/enums/contactType";
+import { createContactDetailModel } from "@/models/contactModels";
+import { useHTMLUtils } from "@/utils/htmlUtils";
+
+// Layout components.
+import PublicSubPageLayout from "@/layouts/public/PublicSubPageLayout.astro";
+
+// Dependencies.
+const { compute } = useHTMLUtils();
+
+// Model.
+const responseDtos = await Astro.locals.services.contactService.getListAsync();
+const model = responseDtos.map(createContactDetailModel);
+
+// Computed.
+const addressContact = compute<ContactDetailModel | null>(() => {
+  return model.find(contact => contact.type === ContactType.Address) ?? null;
+});
+
+const iframeSource = compute<string>(() => {
+  const encodedContent = encodeURIComponent(addressContact ?.content ?? "");
+  return `https://www.google.com/maps?q=${encodedContent}&output=embed`;
+});
+---

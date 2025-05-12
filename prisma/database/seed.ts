@@ -143,7 +143,7 @@ async function generateMembersAsync(transaction: PrismaTransactionalClient) {
 async function generateCertificatesAsync(transaction: PrismaTransactionalClient) {
   if (!await transaction.certificate.count()) {
     await transaction.certificate.create({
-      data: { name: "Quyết định Thành lập", thumbnailUrl: "/upload/images/certificate1.jpg" }
+      data: { name: "Quyết định Thành lập", thumbnailUrl: "https://iili.io/38kpTf2.png" }
     });
   }
 }
