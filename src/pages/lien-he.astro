@@ -2,12 +2,16 @@
 import { ContactType } from "@/enums/contactType";
 import { createContactDetailModel } from "@/models/contactModels";
 import { useHTMLUtils } from "@/utils/htmlUtils";
+import { useDisplayNames } from "@/localization/displayNames";
+import { useRouteUtils } from "@/utils/routeUtils";
 
 // Layout components.
 import PublicSubPageLayout from "@/layouts/public/PublicSubPageLayout.astro";
 
 // Dependencies.
-const { compute } = useHTMLUtils();
+const displayNames = useDisplayNames();
+const { compute, joinHTMLClass, formatPhoneNumber } = useHTMLUtils();
+const routeUtils = useRouteUtils();
 
 // Model.
 const responseDtos = await Astro.locals.services.contactService.getListAsync();
@@ -22,4 +26,148 @@ const iframeSource = compute<string>(() => {
   const encodedContent = encodeURIComponent(addressContact ?.content ?? "");
   return `https://www.google.com/maps?q=${encodedContent}&output=embed`;
 });
+
+function computeContactColumnClassName(contact: ContactDetailModel): string {
+  if (contact.type === ContactType.Address) {
+    return "col col-12";
+  }
+
+  return "col col-xl-6 col-12";
+}
+
+function computeContactTypeDisplayName(contact: ContactDetailModel): string {
+  const displayNamesByType = {
+    [ContactType.PhoneNumber]: displayNames.phoneNumber,
+    [ContactType.ZaloNumber]: displayNames.zalo,
+    [ContactType.Address]: displayNames.address,
+    [ContactType.Email]: displayNames.email
+  };
+
+  return displayNamesByType[contact.type];
+}
+
+function computeContactIconClassName(contact: ContactDetailModel): string {
+  const iconClassNamesByType = {
+    [ContactType.PhoneNumber]: "bi-telephone-fill",
+    [ContactType.ZaloNumber]: "bi-stop-circle-fill",
+    [ContactType.Email]: "bi-envelope-at-fill",
+    [ContactType.Address]: "bi-geo-alt-fill",
+  };
+
+  return iconClassNamesByType[contact.type];
+}
+
+function computeZaloUrl(contact: ContactDetailModel): string {
+  if (contact.type !== ContactType.ZaloNumber) {
+    return "";
+  }
+
+  return "https://zalo.me/" + contact.content;
+}
 ---
+
+<PublicSubPageLayout pageTitle="Liên hệ">
+  <div class="container-fluid py-4" id="contact-view">
+    <div class="container">
+      <div class="row gx-5 gy-4 px-5 py-4 justify-content-center">
+        {/* Paragraph */}
+        <div class="col col-md-10 col-sm-11 col-12">
+          <p class="fs-2 text-success mb-5">
+            Vui lòng liên hệ với chúng tôi để được tư vấn và chăm sóc tận tình.
+          </p>
+          <p>
+            Chúng tôi sẽ lắng nghe và phản hồi mọi thắc mắc
+            của Quý khách trong vòng 24 giờ.
+          </p>
+          <p>
+            Với đội ngũ lương y giàu kinh nghiệm và tận tâm trong lĩnh vực y học cổ truyền,
+            <a href={routeUtils.getPublicHomeRoutePath()} class="text-success">
+              {Astro.locals.generalSettings.applicationName}
+            </a>
+            luôn đồng hành cùng Quý khách trên hành trình phục hồi sức khỏe xương khớp, giúp cơ
+            thể dẻo dai và khỏe mạnh theo phương pháp tự nhiên, an toàn.
+          </p>
+        </div>
+  
+        {/* Left/Top flex-column */}
+        <div class="col col-xl-6 col-sm-10 col-12 d-flex flex-column">
+          {addressContact != null && (
+            <iframe 
+              width="100%"
+              height="100%"
+              class="img-thumbnail rounded-4 shadow m-0"
+              style="border:0;"
+              loading="lazy"
+              allowfullscreen
+              src={iframeSource}>
+            </iframe>
+          )}
+        </div>
+  
+        {/* Right/Bottom flex-column */}
+        <div class="col col-xl-6 col-sm-10 col-12">
+          <div class="row g-3">
+            {model.map((contact) => (
+              <div class={joinHTMLClass(
+                "d-flex flex-column",
+                computeContactColumnClassName(contact)
+              )}>
+                <span class="fw-bold opacity-75">
+                  <i class={joinHTMLClass(
+                    "bi text-success me-2",
+                    computeContactIconClassName(contact)
+                  )} />
+                  {computeContactTypeDisplayName(contact)}
+                </span>
+    
+                {contact.type === ContactType.PhoneNumber && (
+                  <a href={`tel:${contact.content}`}>
+                    {formatPhoneNumber(contact.content)}
+                  </a>
+                )}
+    
+                {contact.type === ContactType.ZaloNumber && (
+                  <a href={computeZaloUrl(contact)} target="_blank" rel="noopener noreferrer">
+                    {formatPhoneNumber(contact.content)}
+                  </a>
+                )}
+    
+                {contact.type === ContactType.Email && (
+                  <a href={`mailto:${contact.content}`}>
+                    {contact.content}
+                  </a>
+                )}
+    
+                {contact.type === ContactType.Address && (
+                  <a
+                    href={`https://maps.google.com/?q=${encodeURIComponent(contact.content)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {contact.content}
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</PublicSubPageLayout>
+
+<style>
+iframe {
+  min-height: 350px;
+}
+
+a {
+  color: var(--bs-success);
+  text-decoration: none;
+  transition: .2s ease;
+}
+
+a:hover {
+  filter: brightness(150%);
+}
+</style>

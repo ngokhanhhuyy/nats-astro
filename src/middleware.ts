@@ -42,7 +42,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
     context.locals.contacts = (await context.locals.services.contactService.getListAsync())
       .map(createContactDetailModel);
 
-    
+    // Clear token and redirect if the request is sent to sign out route path.
+    if (context.url.pathname.startsWith(routeUtils.getSignOutRoutePath())) {
+      context.cookies.delete("Authorization");
+      context.rewrite(routeUtils.getPublicHomeRoutePath());
+    }
 
     // Verify jwt token.
     const token = context.cookies.get("Authorization");
@@ -57,7 +61,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
 
     // Authorize admin route.
-    const isProtectedRoute = context.url.pathname.startsWith(routeUtils.getProtectedRoutePath());
+    const isProtectedRoute = context.url.pathname
+      .startsWith(routeUtils.getProtectedRoutePath());
     if (isProtectedRoute && !context.locals.caller) {
       return context.redirect(routeUtils.getSignInRoutePath());
     }

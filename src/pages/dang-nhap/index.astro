@@ -1,6 +1,5 @@
 ---
 import { createSignInModel } from "@/models/signInModels";
-import { useAuthenticationService } from "@/services/authenticationService";
 import { useDisplayNames } from "@/localization/displayNames";
 import { ValidationError, OperationError } from "@/errors";
 import { useHTMLUtils } from "@/utils/htmlUtils";
@@ -13,7 +12,6 @@ import Field from "@/components/form/Field.astro";
 import TextInput from "@/components/form/TextInput.astro";
 
 // Dependencies.
-const authenticationService = useAuthenticationService();
 const { joinHTMLClass } = useHTMLUtils();
 const displayNames = useDisplayNames();
 
@@ -24,7 +22,8 @@ if (Astro.request.method.toLowerCase() === "post") {
   try {
     const formData = await Astro.request.formData();
     model.parseFromForm(formData);
-    const token = await authenticationService.generateTokenAsync(model.toRequestDto());
+    const token = await Astro.locals.services.authenticationService
+      .generateTokenAsync(model.toRequestDto());
     Astro.cookies.set("Authorization", `Bearer ${token}`);
     return Astro.redirect("/");
   } catch (error) {
@@ -45,7 +44,7 @@ if (Astro.request.method.toLowerCase() === "post") {
         <div class="d-flex justify-content-center align-items-center p-4 pb-2">
           <div class="logo-container">
             <img
-              src="/images/main-logo-transparent-white.png"
+              src="https://iili.io/3vzwO9S.png"
               alt={Astro.locals.generalSettings.applicationName}
               class="logo w-100 h-100"
             />
@@ -55,19 +54,17 @@ if (Astro.request.method.toLowerCase() === "post") {
         <!-- Form -->
         <form method="post" class="bg-white p-3 w-100">
           {/* UserName */}
-          <Field name="userName" displayName={displayNames.userName} floating>
+          <Field name="userName" displayName={displayNames.userName} class="mb-3" floating>
             <TextInput name="userName" value={model.userName} />
           </Field>
 
           {/* Password */}
-          <Field name="password" displayName={displayNames.password} floating>
+          <Field name="password" displayName={displayNames.password} class="mb-3" floating>
             <TextInput name="password" type="password" />
           </Field>
 
           {/* SubmitButton */}
-          <button type="submit" class="btn btn-success">
-            Đăng nhập
-          </button>
+          <button type="submit" class="btn btn-success w-100"> Đăng nhập </button>
         </form>
       </div>
     </div>
@@ -75,23 +72,29 @@ if (Astro.request.method.toLowerCase() === "post") {
 </RootLayout>
 
 <style>
-  body {
-    background: rgba(0, 0, 0, 0.1);
-    height: fit-content;
-    min-height: 100%;
-    padding: 0;
-    margin: 0;
+  .container-fluid {
+    background-color: var(--bs-success);
     display: flex;
-    align-items: stretch;
     justify-content: center;
+    align-items: center;
   }
 
-  .container {
-    background: white;
-    width: 100%;
-    max-width: 1200px;
-    border-left: 1px solid rgba(0, 0, 0, 0.25);
-    border-right: 1px solid rgba(0, 0, 0, 0.25);
-    min-height: 100vh;
+  .form-container {
+    background-color: var(--bs-white);
+    border: 1px solid var(--bs-success);
+    overflow: hidden;
+    width: 350px;
+  }
+
+  .logo-container {
+    background: transparent;
+    width: 250px;
+    height: 250px;
+    padding: 3rem;
+    border: 5px solid var(--bs-success);
+    overflow: visible;
+    border-radius: 50%;
+    filter: brightness(0) saturate(100%) invert(38%) sepia(74%) saturate(430%)
+      hue-rotate(100deg) brightness(94%) contrast(95%);
   }
 </style>
