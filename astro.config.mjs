@@ -1,7 +1,6 @@
 // @ts-check
 import { defineConfig } from "astro/config";
 import node from "@astrojs/node";
-import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -13,7 +12,7 @@ export default defineConfig({
     allowedHosts: ["frontend-workstation.khanhhuy.dev", "localhost:5173"],
   },
   output: "server",
-  adapter: isProduction ? cloudflare() : node({ mode: "standalone" }),
+  adapter: node({ mode: "standalone" }),
   integrations: [react()],
   devToolbar: {
     enabled: false,
