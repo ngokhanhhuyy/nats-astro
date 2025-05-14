@@ -9,12 +9,11 @@ import ProtectedLayout from "@/layouts/protected/ProtectedLayout.astro";
 import MainBlock from "@/layouts/protected/MainBlock.astro";
 
 // Dependencies.
-const service = useSliderItemService();
 const routeUtils = useRouteUtils();
 const { compute } = useHTMLUtils();
 
 // Model.
-const responseDtos = await service.getListAsync();
+const responseDtos = await Astro.locals.services.sliderItemService.getListAsync();
 const model = responseDtos.map((dto) => createSliderItemDetailModel(dto));
 
 // Computed.
