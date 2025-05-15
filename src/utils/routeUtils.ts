@@ -80,17 +80,24 @@ const routeUtils = {
   },
 
   // Protected - contacts.
-  getProtectedContactListRoutePath : () => "/quan-tri/lien-he",
+  getProtectedContactListRoutePath: () => "/quan-tri/lien-he",
   getProtectedContactDetailRoutePath: (id: number) => `/quan-tri/lien-he/${id}`,
   getProtectedContactCreateRoutePath : () => "/quan-tri/lien-he/tao-moi",
   getProtectedContactUpdateRoutePath: (id: number) => `/quan-tri/lien-he/${id}/chinh-sua`,
-  getProtectedContactDeleteRoutePath: (id: number) => `/quan-tri/lien-he/${id}/xoa-bo`,
+  getProtectedContactDeleteRoutePath: (id: number) => {
+    return `/quan-tri/lien-he/${id}/chinh-sua?delete=true`;
+  },
 
   // Protected - enquiries.
   getProtectedEnquiryListRoutePath : () => "/quan-tri/cau-hoi",
   getProtectedEnquiryDetailRoutePath: (id: number) => `/quan-tri/cau-hoi/${id}`,
   getProtectedEnquiryCreateRoutePath : () => "/quan-tri/cau-hoi",
-  getProtectedEnquiryUpdateRoutePath: (id: number) => `/quan-tri/cau-hoi/${id}`
+  getProtectedEnquiryUpdateRoutePath: (id: number) => `/quan-tri/cau-hoi/${id}`,
+
+  // Others.
+  getNotFoundErrorRoutePath: () => "/404-not-found",
+  getCreatedOrUpdatedSuccessfullyRoutePath: () => "/luu-thanh-cong",
+  getDeletedSuccessfullyRoutePath
 }
 
 export function useRouteUtils() {

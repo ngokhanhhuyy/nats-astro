@@ -1,0 +1,46 @@
+---
+import { useHTMLUtils } from "@/utils/htmlUtils";
+import { useRouteUtils } from "@/utils/routeUtils";
+
+// Layout component.
+import RootLayout from "@/layouts/RootLayout.astro";
+import MainBlock from "@/layouts/protected/MainBlock.astro";
+
+// Dependencies.
+const { compute } = useHTMLUtils();
+const routeUtils = useRouteUtils();
+
+// Computed.
+let typeDisplayName: string;
+const type = Astro.url.searchParams.get("type")?.toLowerCase();
+if (!type) {
+  return Astro.redirect(routeUtils.getNotFoundErrorRoutePath());
+}
+
+switch (type) {
+  case "created-successfully":
+    typeDisplayName = "Tạo";
+    break;
+  case "updated-successfully":
+    typeDisplayName = "Chỉnh sửa";
+    break;
+  case "deleted-successfully":
+    typeDisplayName = "Xoá";
+    break;
+  default:
+    return Astro.redirect(routeUtils.getNotFoundErrorRoutePath());
+}
+
+const pageTitle = `${typeDisplayName} dữ liệu thành công.`;
+---
+
+<RootLayout pageTitle={pageTitle}>
+  <div class="row g-3">
+    <div class="col col-12">
+      <MainBlock title={pageTitle} bodyClass="d-flex flex-column p-3">
+        Dữ liệu đã được {typeDisplayName} thành công.
+        Bạn sẽ được đưa 
+      </MainBlock>
+    </div>
+  </div>
+</RootLayout>

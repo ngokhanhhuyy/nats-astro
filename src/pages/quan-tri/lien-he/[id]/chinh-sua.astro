@@ -24,10 +24,15 @@ try {
     const responseDto = await Astro.locals.services.contactService.getSingleAsync(id);
     model.mapFromResponseDto(responseDto);
   } else if (Astro.request.method.toLowerCase() === "post") {
-    model.parseFromForm(await Astro.request.formData());
-    const requestDto = model.toRequestDto();
-    await Astro.locals.services.contactService.updateAsync(id, requestDto);
-    return Astro.redirect(routeUtils.getProtectedContactListRoutePath());
+    const isForDelete = Astro.url.searchParams.get("delete");
+    if (isForDelete?.toLowerCase() === "true") {
+      await Astro.locals.services.contactService.deleteAsync(id);
+    } else {
+      model.parseFromForm(await Astro.request.formData());
+      const requestDto = model.toRequestDto();
+      await Astro.locals.services.contactService.updateAsync(id, requestDto);
+      return Astro.redirect(routeUtils.getProtectedContactListRoutePath());
+    }
   }
 } catch (error) {
   if (error instanceof ValidationError) {
