@@ -1,0 +1,17 @@
+---
+import { createSummaryItemBasicModel } from "@/models/summaryItemModels";
+
+// Shared component.
+import ListWithThumbnail from "@/components/routes/protected/ListWithThumbnail.astro";
+
+// Model.
+const responseDtos = await Astro.locals.services.summaryItemService.getBasicListAsync();
+const model = responseDtos.map(createSummaryItemBasicModel);
+---
+
+<ListWithThumbnail
+  model={model}
+  pageTitle="Danh sách giới thiệu"
+  name={(item) => item.name}
+  description={(item) => item.summaryContent}
+/>

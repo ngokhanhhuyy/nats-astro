@@ -2,7 +2,6 @@
 import { createSignInModel } from "@/models/signInModels";
 import { useDisplayNames } from "@/localization/displayNames";
 import { ValidationError, OperationError } from "@/errors";
-import { useHTMLUtils } from "@/utils/htmlUtils";
 
 // Layout component.
 import RootLayout from "@/layouts/RootLayout.astro";
@@ -12,7 +11,6 @@ import Field from "@/components/form/Field.astro";
 import TextInput from "@/components/form/TextInput.astro";
 
 // Dependencies.
-const { joinHTMLClass } = useHTMLUtils();
 const displayNames = useDisplayNames();
 
 // Model.

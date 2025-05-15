@@ -1,0 +1,25 @@
+---
+import { createContactDetailModel } from "@/models/contactModels";
+import { useRouteUtils } from "@/utils/routeUtils";
+
+// Shared component.
+import ProtectedLayout from "@/layouts/protected/ProtectedLayout.astro";
+import MainBlock from "@/layouts/protected/MainBlock.astro";
+
+// Dependencies.
+const routeUtils = useRouteUtils();
+
+// Model.
+const responseDtos = await Astro.locals.services.contactService.getListAsync();
+const model = responseDtos.map(createContactDetailModel);
+---
+
+<ProtectedLayout pageTitle="Chi tiết liên hệ">
+  <div class="row g-3">
+    <div class="col col-12">
+      <MainBlock title="Chi tiết liên hệ">
+        
+      </MainBlock>
+    </div>
+  </div>
+</ProtectedLayout>

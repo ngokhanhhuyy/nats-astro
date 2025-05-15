@@ -15,7 +15,7 @@ declare global {
     id: number;
     title: string | null;
     thumbnailUrl: string;
-    updateRoutePath: string;
+    protectedUpdateRoutePath: string;
   };
 
   type SliderItemUpsertModel = {
@@ -41,7 +41,7 @@ function createDetail(responseDto: SliderItemResponseDto): SliderItemDetailModel
     id: responseDto.id,
     title: responseDto.title,
     thumbnailUrl: responseDto.thumbnailUrl,
-    get updateRoutePath(): string {
+    get protectedUpdateRoutePath(): string {
       return routeUtils.getProtectedSliderItemUpdateRoutePath(this.id);
     }
   };

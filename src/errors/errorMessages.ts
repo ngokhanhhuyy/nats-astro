@@ -21,6 +21,14 @@ const errorMessages = {
 
   stringMaxOrEqualLength(displayName: string, length: number): string {
     return `${displayName} phải có độ dài bằng hoặc ít hơn ${length} ký tự.`;
+  },
+
+  notExists(displayName: string): string {
+    return `${displayName} không tồn tại.`;
+  },
+
+  incorrect(displayName: string): string {
+    return `${displayName} không chính xác.`
   }
 };
 

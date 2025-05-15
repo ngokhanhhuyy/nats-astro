@@ -1,6 +1,12 @@
-import { ValidationError } from "@/errors";
 import { z } from "astro:schema";
-import dot from "dot-object";
+import { useFormDataUtils } from "@/utils/formDataUtils";
+import { useDisplayNames } from "@/localization/displayNames";
+import { useErrorMessages } from "@/errors";
+import { ValidationError } from "@/errors";
+
+const formDataUtils = useFormDataUtils();
+const displayNames = useDisplayNames();
+const errorMessages = useErrorMessages();
 
 declare global {
   type SignInModel = {
@@ -11,9 +17,9 @@ declare global {
   };
 }
 
-const parser = z.object({
-  userName: z.string().min(1, { message: "Username cannot be left empty." }),
-  password: z.string().min(1, { message: "Password cannot be left empty." })
+const schema = z.object({
+  userName: z.string().min(1, { message: errorMessages.required(displayNames.userName) }),
+  password: z.string().min(1, { message: errorMessages.required(displayNames.password) })
 });
 
 export function createSignInModel(): SignInModel {
@@ -21,12 +27,9 @@ export function createSignInModel(): SignInModel {
     userName: "",
     password: "",
     parseFromForm(formData: FormData) {
-      const formDataAsObject: Partial<Record<string, FormDataEntryValue>> = { };
-      for (const [path, value] of formData.entries()) {
-        formDataAsObject[path] = value;
-      }
+      const formDataAsObject = formDataUtils.formDataToObject(formData);
       try {
-        const parsedData = parser.parse(dot.object(formDataAsObject));
+        const parsedData = schema.parse(formDataAsObject);
         model.userName = parsedData.userName;
         model.password = parsedData.password;
       } catch (error) {

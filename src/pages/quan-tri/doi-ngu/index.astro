@@ -1,0 +1,22 @@
+---
+import { createMemberDetailModel } from "@/models/memberModels";
+import { useRouteUtils } from "@/utils/routeUtils";
+
+// Shared component.
+import ListWithThumbnail from "@/components/routes/protected/ListWithThumbnail.astro";
+
+// Dependencies.
+const routeUtils = useRouteUtils();
+
+// Model.
+const responseDtos = await Astro.locals.services.memberService.getListAsync();
+const model = responseDtos.map(createMemberDetailModel);
+---
+
+<ListWithThumbnail
+  model={model}
+  pageTitle="Danh sách thành viên đội ngũ"
+  name={(item) => item.fullName}
+  description={(item) => item.description}
+  createRoutePath={routeUtils.getProtectedMemberCreateRoutePath()}
+/>

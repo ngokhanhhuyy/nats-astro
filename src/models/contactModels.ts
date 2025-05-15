@@ -12,11 +12,12 @@ const formDataUtils = useFormDataUtils();
 const routeUtils = useRouteUtils();
 
 declare global {
-  type ContactDetailModel = {
+  type ContactDetailModel = Readonly<{
     id: number;
     type: ContactType;
     content: string;
-  };
+    protectedUpdateRoutePath: string;
+  }>;
 
   type ContactUpsertModel = {
     id: number;
@@ -90,7 +91,10 @@ function createDetail(responseDto: ContactResponseDto): ContactDetailModel {
   return {
     id: responseDto.id,
     type: responseDto.type,
-    content: responseDto.content
+    content: responseDto.content,
+    get protectedUpdateRoutePath(): string {
+      return routeUtils.getProtectedContactUpdateRoutePath(this.id);
+    }
   };
 }
 

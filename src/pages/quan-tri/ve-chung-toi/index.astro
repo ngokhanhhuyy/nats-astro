@@ -1,8 +1,6 @@
 ---
-import { useAboutUsIntroductionService } from "@/services/aboutUsIntroductionService";
 import { createAboutUsIntroductionDetailModel } from "@/models/aboutUsIntroductionModels";
 import { useHTMLUtils } from "@/utils/htmlUtils";
-import { useRouteUtils } from "@/utils/routeUtils";
 import { useDisplayNames } from "@/localization/displayNames";
 
 // Layout components.
@@ -10,13 +8,11 @@ import ProtectedLayout from "@/layouts/protected/ProtectedLayout.astro";
 import MainBlock from "@/layouts/protected/MainBlock.astro";
 
 // Dependencies.
-const service = useAboutUsIntroductionService();
 const { compute } = useHTMLUtils();
-const routeUtils = useRouteUtils();
 const displayNames = useDisplayNames();
 
 // Model.
-const responseDto = await service.getAsync();
+const responseDto = await Astro.locals.services.aboutUsIntroductionService.getAsync();
 const model = createAboutUsIntroductionDetailModel(responseDto);
 
 // Computed.

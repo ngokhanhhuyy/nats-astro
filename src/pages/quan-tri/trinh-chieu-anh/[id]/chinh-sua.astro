@@ -1,14 +1,12 @@
 ---
-import { useSliderItemService } from "@/services/sliderItemService";
 import { createSliderItemUpsertModel } from "@/models/sliderItemModels";
 import { useRouteUtils } from "@/utils/routeUtils";
 import { ValidationError, NotFoundError } from "@/errors";
 
 // Page component.
-import SliderItemUpsert from "@/components/routes/protected/SliderItemUpsert.astro";
+import Upsert from "../_Upsert.astro";
 
 // Dependencies.
-const service = useSliderItemService();
 const routeUtils = useRouteUtils();
 
 // Model.
@@ -21,12 +19,12 @@ if (isNaN(id)) {
 // Request handling.
 try {
   if (Astro.request.method.toLowerCase() === "get") {
-    const responseDto = await service.getSingleAsync(id);
+    const responseDto = await Astro.locals.services.sliderItemService.getSingleAsync(id);
     model.mapFromResponseDto(responseDto);
   } else if (Astro.request.method.toLowerCase() === "post") {
     model.parseFromForm(await Astro.request.formData());
     const requestDto = model.toRequestDto();
-    await service.updateAsync(id, requestDto);
+    await Astro.locals.services.sliderItemService.updateAsync(id, requestDto);
     return Astro.redirect(routeUtils.getProtectedSliderItemListRoutePath());
   }
 } catch (error) {
@@ -42,4 +40,4 @@ try {
 }
 ---
 
-<SliderItemUpsert model={model} isForCreating={false} />
+<Upsert model={model} isForCreating={false} />

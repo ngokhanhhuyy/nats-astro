@@ -1,0 +1,22 @@
+---
+import { createCertificateDetailModel } from "@/models/certificateModels";
+import { useRouteUtils } from "@/utils/routeUtils";
+
+// Shared component.
+import ListWithThumbnail from "@/components/routes/protected/ListWithThumbnail.astro";
+
+// Dependencies.
+const routeUtils = useRouteUtils();
+
+// Model.
+const responseDtos = await Astro.locals.services.certificateService.getListAsync();
+const model = responseDtos.map(createCertificateDetailModel);
+---
+
+<ListWithThumbnail
+  model={model}
+  pageTitle="Danh sách chứng chỉ"
+  name={(item) => item.name ?? `Chứng chỉ #${item.id}`}
+  description={(item) => item.name ?? `Chứng chỉ #${item.id}`}
+  createRoutePath={routeUtils.getProtectedCertificateCreateRoutePath()}
+/>

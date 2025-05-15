@@ -11,7 +11,7 @@ const formDataUtils = useFormDataUtils();
 const routeUtils = useRouteUtils();
 
 declare global {
-  type MemberDetailModel = {
+  type MemberDetailModel = Readonly<{
     id: number;
     fullName: string;
     roleName: string;
@@ -19,7 +19,7 @@ declare global {
     description: string;
     protectedDetailRoutePath: string;
     protectedUpdateRoutePath: string;
-  };
+  }>;
 
   type MemberUpsertModel = {
     id: number;

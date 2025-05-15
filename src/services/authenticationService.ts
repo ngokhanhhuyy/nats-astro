@@ -1,5 +1,7 @@
 import type { PrismaClient } from "@prisma/client";
 import { verifyPasswordAsync } from "@/utils/passwordUtils";
+import { useDisplayNames } from "@/localization/displayNames";
+import { useErrorMessages } from "@/errors";
 import { OperationError } from "@/errors";
 import jwt, { type Secret } from "jsonwebtoken";
 
@@ -12,6 +14,8 @@ type Payload = {
   user: UserDetailResponseDto
 };
 
+const displayNames = useDisplayNames();
+const errorMessages = useErrorMessages();
 const secretKey = import.meta.env.SECRET_KEY as Secret;
 
 export function useAuthenticationService(prisma: PrismaClient) {
@@ -50,12 +54,12 @@ export function useAuthenticationService(prisma: PrismaClient) {
     
       // Ensure the user exists.
       if (!user) {
-        throw new OperationError({ userName: "User doesn't exist." });
+        throw new OperationError({ userName: errorMessages.notExists(displayNames.userName) });
       }
     
       // Ensure the user's password is correct
       if (!verifyPasswordAsync(requestDto.password, user.passwordHash)) {
-        throw new OperationError({ password: "Password is incorrect." });
+        throw new OperationError({ password: errorMessages.incorrect(displayNames.password) });
       }
       
       // Generate the token.

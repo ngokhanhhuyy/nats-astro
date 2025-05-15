@@ -1,0 +1,110 @@
+---
+import { usePhotoUtils } from "@/utils/photoUtils";
+
+// Layout component.
+import ProtectedLayout from "@/layouts/protected/ProtectedLayout.astro";
+import MainBlock from "@/layouts/protected/MainBlock.astro";
+
+// Props.
+interface IModel {
+  readonly id: number;
+  readonly thumbnailUrl?: string | null;
+  readonly protectedUpdateRoutePath: string;
+}
+
+type Props<T extends IModel> = {
+  model: T[];
+  pageTitle: string;
+  name(model: T): string;
+  description(model: T): string;
+  createRoutePath?: string;
+};
+
+const props = Astro.props as Props<IModel>;
+
+// Dependencies.
+const photoUtils = usePhotoUtils();
+---
+
+<ProtectedLayout pageTitle={props.pageTitle}>
+  <div class="row g-3">
+    <div class="col col-12">
+      <MainBlock title={props.pageTitle}>
+        {props.createRoutePath && (
+          <a href={props.createRoutePath} class="btn btn-success btn-sm" slot="header">
+            <i class="bi bi-plus-lg me-1"></i>
+            <span>Tạo mới</span>
+          </a>
+        )}
+        
+        <ul class="list-group list-group-flush" slot="body">
+          {props.model.map((item) => (
+            <li class="list-group-item d-flex">
+              {/* Thumbnail */}
+              {item.thumbnailUrl !== undefined && (
+                <a href={item.protectedUpdateRoutePath} class="flex-shrink-0">
+                  <img
+                    src={item.thumbnailUrl ?? photoUtils.getDefaultPhotoUrl()}
+                    alt={props.name(item)}
+                    class="img-thumbnail thumbnail"
+                  />
+                </a>
+              )}
+
+              {/* Name */}
+              <div class="flex-fill mx-2 detail-column">
+                <a href={item.protectedUpdateRoutePath} class="fw-bold">
+                  {props.name(item)}
+                </a>
+                <br />
+                <span class="small opacity-50">{props.description(item)}</span>
+              </div>
+
+              {/* EditButton */}
+              <a
+                href={item.protectedUpdateRoutePath}
+                class="btn btn-outline-success btn-sm flex-shrink-0"
+              >
+                <i class="bi bi-pencil-square" />
+                <span class="ms-1 d-sm-inline d-none">Sửa</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </MainBlock>
+    </div>
+  </div>
+</ProtectedLayout>
+
+<style>
+  .list-group-item {
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+  }
+
+  .thumbnail {
+    width: 60px;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    transition:
+      border-color,
+      background-color 0.6s ease;
+  }
+
+  .detail-column {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  a:not(.btn) {
+    color: var(--bs-success);
+    text-decoration: none;
+  }
+
+  a:not(.btn):hover {
+    text-decoration: underline;
+  }
+</style>
