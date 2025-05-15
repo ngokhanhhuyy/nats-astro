@@ -84,6 +84,7 @@ const routeUtils = {
   getProtectedContactDetailRoutePath: (id: number) => `/quan-tri/lien-he/${id}`,
   getProtectedContactCreateRoutePath : () => "/quan-tri/lien-he/tao-moi",
   getProtectedContactUpdateRoutePath: (id: number) => `/quan-tri/lien-he/${id}/chinh-sua`,
+  getProtectedContactDeleteRoutePath: (id: number) => `/quan-tri/lien-he/${id}/xoa-bo`,
 
   // Protected - enquiries.
   getProtectedEnquiryListRoutePath : () => "/quan-tri/cau-hoi",

@@ -1,0 +1,68 @@
+---
+import { ContactType } from "@/enums/contactType";
+import { useDisplayNames } from "@/localization/displayNames";
+import { useHTMLUtils } from "@/utils/htmlUtils";
+
+// Layout component.
+import ProtectedUpsertLayout from "@/layouts/protected/ProtectedUpsertLayout.astro";
+import MainBlock from "@/layouts/protected/MainBlock.astro";
+
+// Form components.
+import Field from "@/components/form/Field.astro";
+import TextInput from "@/components/form/TextInput.astro";
+import SelectInput, { type Option } from "@/components/form/SelectInput.astro";
+import SubmitButton from "@/components/form/SubmitButton.astro";
+
+// Props.
+type Props = { model: ContactUpsertModel; isForCreating: boolean; };
+
+// Dependencies.
+const displayNames = useDisplayNames();
+const { compute } = useHTMLUtils();
+
+// Computed.
+const pageTitle = compute<string>(() => {
+  if (Astro.props.isForCreating) {
+    return "Tạo liên hệ mới";
+  }
+
+  return "Chỉnh sửa liên hệ";
+});
+
+const typeOptions = compute<Option[]>(() => [
+  { value: ContactType.PhoneNumber, displayName: displayNames.phoneNumber },
+  { value: ContactType.ZaloNumber, displayName: displayNames.zaloNumber },
+  { value: ContactType.Email, displayName: displayNames.email },
+  { value: ContactType.Address, displayName: displayNames.address }
+]);
+---
+
+<ProtectedUpsertLayout pageTitle={pageTitle}>
+  <form method="post" class="row g-3 justify-content-end" novalidate>
+    <div class="col col-12">
+      <MainBlock title={pageTitle} bodyPadding={[2, 3, 3, 3]}>
+        {/* Type */}
+        <Field name="type" displayName={displayNames.type} class="mb-3">
+          <SelectInput name="type" options={typeOptions} value={Astro.props.model.type} />
+        </Field>
+
+        {/* Content */}
+        <Field name="content" displayName={displayNames.content}>
+          <TextInput
+            name="content"
+            placeholder={displayNames.content}
+            value={Astro.props.model.content}
+          />
+        </Field>
+      </MainBlock>
+    </div>
+
+    <div class="col col-auto">
+      <slot />
+    </div>
+
+    <div class="col col-auto">
+      <SubmitButton />
+    </div>
+  </form>
+</ProtectedUpsertLayout>

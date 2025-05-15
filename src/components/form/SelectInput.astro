@@ -1,0 +1,30 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { useHTMLUtils } from "@/utils/htmlUtils";
+
+// Props.
+export type Option = { value: string; displayName: string };
+type Props = { name: string; options: Option[]; } & HTMLAttributes<"select">;
+
+// Dependencies.
+const { compute } = useHTMLUtils();
+
+// Computed.
+const computedClass = compute<string>(() => {
+  const names = [Astro.props.class, "form-select"];
+
+  if (Astro.locals.modelErrorMessagesStore.hasError(Astro.props.name)) {
+    names.push(Astro.locals.modelErrorMessagesStore.getInputClass(Astro.props.name));
+  } 
+
+  return names.filter(name => name).join(" ");
+});
+---
+
+<select {...Astro.props} class={computedClass}>
+  {Astro.props.options.map((o) => (
+    <option value={o.value} selected={Astro.props.value === o.value}>
+      {o.displayName}
+    </option>
+  ))}
+</select>

@@ -21,11 +21,17 @@ const errorMessages = compute<string[]>(() => {
   {errorMessages.length > 0 && (
     <div class="row g-3 mb-3">
       <div class="col col-12">
-        <MainBlock title="Lỗi dữ liệu không hợp lệ" bodyPadding={3} color="danger">
+        <MainBlock
+          title="Lỗi dữ liệu không hợp lệ"
+          bodyPadding={3}
+          bodyClass="text-danger"
+          color="danger"
+          id="error-summary-block"
+        >
           {errorMessages.length === 1 ? (
-            <span class="text-danger">{errorMessages[0]}</span>
+            <span>{errorMessages[0]}</span>
           ) : errorMessages.map(message => (
-            <span class="text-danger">ー {message}</span><br/>
+            <span>ー {message}</span><br/>
           ))}
         </MainBlock>
       </div>
@@ -35,3 +41,16 @@ const errorMessages = compute<string[]>(() => {
   <slot></slot>
 </ProtectedLayout>
 
+<script>
+  import type { IModelErrorMessagesStore } from "@/utils/modelErrorUtils";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const errorSummaryBlockBodyElement = document.querySelector("#error-summary-block .block-body");
+    document.addEventListener("ajax-request-error", handleAjaxRequestError);
+
+    function handleAjaxRequestError(e: Event): void {
+      const event = e as CustomEvent<IModelErrorMessagesStore>;
+      errorSummaryBlockElement
+    }
+  });
+</script>

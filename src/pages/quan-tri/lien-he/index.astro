@@ -14,11 +14,36 @@ const responseDtos = await Astro.locals.services.contactService.getListAsync();
 const model = responseDtos.map(createContactDetailModel);
 ---
 
-<ProtectedLayout pageTitle="Chi tiết liên hệ">
-  <div class="row g-3">
+<ProtectedLayout pageTitle="Danh sách liên hệ">
+  <div class="row g-3 jusitfy-content-end">
     <div class="col col-12">
-      <MainBlock title="Chi tiết liên hệ">
-        
+      <MainBlock title="Chi tiết liên hệ" bodyPadding={0}>
+        <a
+          href={routeUtils.getProtectedContactCreateRoutePath()}
+          class="btn btn-success btn-sm"
+          slot="header"
+        >
+          <i class="bi bi-plus-lg"></i>
+          <span class="d-sm-inline d-none ms-1">Tạo mới</span>
+        </a>
+
+        <ul class="list-group list-group-flush" slot="body">
+          {model.map((contact) => (
+            <li class="list-group-item bg-transparent d-flex align-items-center">
+              <div class="detail d-flex flex-column flex-fill">
+                <span class="text-success fw-bold">{contact.formattedContent}</span>
+                <span class="text-secondary opacity-75">{contact.typeDisplayName}</span>
+              </div>
+
+              <a
+                href={contact.protectedUpdateRoutePath}
+                class="btn btn-outline-success btn-sm flex-shrink-0"
+              >
+                <i class="bi bi-pencil-square"></i>
+              </a>
+            </li>
+          ))}
+        </ul>
       </MainBlock>
     </div>
   </div>

@@ -1,4 +1,5 @@
 ---
+import type { HTMLAttributes } from "astro/types";
 import { useHTMLUtils } from "@/utils/htmlUtils";
 
 // Props.
@@ -10,7 +11,7 @@ type Props = {
   bodyClass?: string;
   bodyPadding?: string | number | [number, number] | [number, number, number, number];
   bodyBorder?: boolean;
-};
+} & HTMLAttributes<"div">;
 const { color = "success", ...props } = Astro.props;
 
 // Dependencies.

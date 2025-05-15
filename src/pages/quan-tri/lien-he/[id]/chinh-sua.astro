@@ -1,0 +1,45 @@
+---
+import { createContactUpsertModel } from "@/models/contactModels";
+import { useRouteUtils } from "@/utils/routeUtils";
+import { ValidationError, NotFoundError } from "@/errors";
+
+// Form component.
+import DeleteButton from "@/components/form/DeleteButton.astro";
+
+// Shared component.
+import Upsert from "../_Upsert.astro";
+
+// Dependencies.
+const routeUtils = useRouteUtils();
+
+// Model.
+const id = parseInt(Astro.params.id as string);
+if (isNaN(id)) {
+  return Astro.redirect(routeUtils.getProtectedContactListRoutePath());
+}
+
+const model = createContactUpsertModel();
+try {
+  if (Astro.request.method.toLowerCase() === "get") {
+    const responseDto = await Astro.locals.services.contactService.getSingleAsync(id);
+    model.mapFromResponseDto(responseDto);
+  } else if (Astro.request.method.toLowerCase() === "post") {
+    model.parseFromForm(await Astro.request.formData());
+    const requestDto = model.toRequestDto();
+    await Astro.locals.services.contactService.updateAsync(id, requestDto);
+    return Astro.redirect(routeUtils.getProtectedContactListRoutePath());
+  }
+} catch (error) {
+  if (error instanceof ValidationError) {
+    Astro.locals.modelErrorMessagesStore.setErrorMessages(error.errorMessages);
+  } else if (error instanceof NotFoundError) {
+    return Astro.redirect(routeUtils.getProtectedDashboardRoutePath());
+  } else {
+    throw error;
+  }
+}
+---
+
+<Upsert model={model} isForCreating={false}>
+  <DeleteButton action={routeUtils.getProtectedContactDeleteRoutePath(id)} />
+</Upsert>

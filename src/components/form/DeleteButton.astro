@@ -1,0 +1,46 @@
+---
+import type { HTMLAttributes } from "astro/types"
+
+// Props.
+type Props = { action: string } & HTMLAttributes<"button">;
+---
+
+<button class="btn btn-outline-danger delete-button" data-delete-action={Astro.props.action}>
+  <div class="idle">
+    <i class="bi bi-trash3"></i>
+    <span class="d-sm-inline d-none ms-1">Xóa</span>
+  </div>
+  <div class="sending d-none">
+    <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+    <span class="visually-hidden" role="status">Đang xóa ...</span>
+  </div>
+</button>
+
+<script>
+  import { useRouteUtils } from "@/utils/routeUtils";
+
+  const routeUtils = useRouteUtils();
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const deleteButtons = document.querySelectorAll<HTMLButtonElement>(".delete-button");
+    deleteButtons.forEach((button) => {
+      const buttonSendingElement = button.querySelector(".sending");
+      const buttonIdleElement = button.querySelector(".idle");
+
+      const deleteActionUrl = button.getAttribute("data-delete-action");
+      if (!deleteActionUrl) {
+        return;
+      }
+
+      button.addEventListener("click", async () => {
+        button.disabled = true;
+        buttonSendingElement?.classList.remove("d-none");
+        buttonIdleElement?.classList.add("d-none");
+        await fetch(deleteActionUrl, { credentials: "include" });
+        buttonSendingElement?.classList.add("d-none");
+        buttonIdleElement?.classList.remove("d-none");
+        location.href = routeUtils.getProtectedContactListRoutePath();
+      });
+    });
+  });
+</script>

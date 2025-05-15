@@ -3,12 +3,14 @@ import { z } from "astro:schema";
 import { useErrorMessages } from "@/errors";
 import { useDisplayNames } from "@/localization/displayNames";
 import { useFormDataUtils } from "@/utils/formDataUtils";
+import { useHTMLUtils } from "@/utils/htmlUtils";
 import { useRouteUtils } from "@/utils/routeUtils";
 import { ValidationError } from "@/errors";
 
 const errorMessages = useErrorMessages();
 const displayNames = useDisplayNames();
 const formDataUtils = useFormDataUtils();
+const htmlUtils = useHTMLUtils();
 const routeUtils = useRouteUtils();
 
 declare global {
@@ -16,6 +18,8 @@ declare global {
     id: number;
     type: ContactType;
     content: string;
+    typeDisplayName: string;
+    formattedContent: string;
     protectedUpdateRoutePath: string;
   }>;
 
@@ -34,7 +38,9 @@ const upsertSchema = z.object({
   content: z
     .string({ message: errorMessages.invalid(displayNames.content) })
     .min(1, { message: errorMessages.required(displayNames.content) })
-}).superRefine((data, context) => {
+});
+
+const upsertStricterSchema = upsertSchema.superRefine((data, context) => {
   const phoneNumberRegExp = /^[^\-+\s][\d\-+\s]+$/g;
   const emailRegExp = /^\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b$/g;
   let maximumLength: number;
@@ -88,10 +94,27 @@ const upsertSchema = z.object({
 });
 
 function createDetail(responseDto: ContactResponseDto): ContactDetailModel {
+  const displayNamesByTypes = {
+    [ContactType.PhoneNumber]: displayNames.phoneNumber,
+    [ContactType.ZaloNumber]: displayNames.zaloNumber,
+    [ContactType.Email]: displayNames.email,
+    [ContactType.Address]: displayNames.address
+  };
+
   return {
     id: responseDto.id,
     type: responseDto.type,
     content: responseDto.content,
+    get typeDisplayName(): string {
+      return displayNamesByTypes[this.type];
+    },
+    get formattedContent(): string {
+      if (this.type === ContactType.PhoneNumber || this.type === ContactType.ZaloNumber) {
+        return htmlUtils.formatPhoneNumber(this.content);
+      }
+
+      return this.content;
+    },
     get protectedUpdateRoutePath(): string {
       return routeUtils.getProtectedContactUpdateRoutePath(this.id);
     }
@@ -106,7 +129,8 @@ function createUpsert(): ContactUpsertModel {
     parseFromForm(formData: FormData): void {
       const formDataAsObject = formDataUtils.formDataToObject(formData);
       try {
-        const parsedData = upsertSchema.parse(formDataAsObject);
+        let parsedData = upsertSchema.parse(formDataAsObject);
+        parsedData = upsertStricterSchema.parse(parsedData);
         this.type = parsedData.type;
         this.content = parsedData.content;
       } catch (error) {
