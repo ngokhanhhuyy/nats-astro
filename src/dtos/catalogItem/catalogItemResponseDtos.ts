@@ -1,4 +1,4 @@
-import { CatalogItemType as PrismaCatalogItemType, type CatalogItem } from "@prisma/client";
+import { type CatalogItem } from "@prisma/client";
 import { CatalogItemType } from "@/enums/catalogItemType";
 
 declare global {
