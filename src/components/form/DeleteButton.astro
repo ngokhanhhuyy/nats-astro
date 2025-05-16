@@ -36,7 +36,7 @@ type Props = { action: string } & HTMLAttributes<"button">;
         button.disabled = true;
         buttonSendingElement?.classList.remove("d-none");
         buttonIdleElement?.classList.add("d-none");
-        await fetch(deleteActionUrl, { credentials: "include" });
+        await fetch(deleteActionUrl, { method: "post", credentials: "include" });
         buttonSendingElement?.classList.add("d-none");
         buttonIdleElement?.classList.remove("d-none");
         location.href = routeUtils.getProtectedContactListRoutePath();

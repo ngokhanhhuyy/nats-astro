@@ -16,7 +16,7 @@ const formDataUtils = {
       searchParamsAsObject[path] = value;
     }
 
-    return dot.object(this.formDataToObject);
+    return dot.object(searchParamsAsObject);
   }
 };
 

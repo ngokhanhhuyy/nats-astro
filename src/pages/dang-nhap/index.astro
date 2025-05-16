@@ -1,6 +1,7 @@
 ---
 import { createSignInModel } from "@/models/signInModels";
 import { useDisplayNames } from "@/localization/displayNames";
+import { useRouteUtils } from "@/utils/routeUtils";
 import { ValidationError, OperationError } from "@/errors";
 
 // Layout component.
@@ -11,6 +12,7 @@ import Field from "@/components/form/Field.astro";
 import TextInput from "@/components/form/TextInput.astro";
 
 // Dependencies.
+const routeUtils = useRouteUtils();
 const displayNames = useDisplayNames();
 
 // Model.

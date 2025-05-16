@@ -25,20 +25,28 @@ try {
     model.mapFromResponseDto(responseDto);
   } else if (Astro.request.method.toLowerCase() === "post") {
     const isForDelete = Astro.url.searchParams.get("delete");
+    let saveType: "update" | "delete";
     if (isForDelete?.toLowerCase() === "true") {
+      saveType = "delete";
       await Astro.locals.services.contactService.deleteAsync(id);
     } else {
+      saveType = "update";
       model.parseFromForm(await Astro.request.formData());
       const requestDto = model.toRequestDto();
       await Astro.locals.services.contactService.updateAsync(id, requestDto);
-      return Astro.redirect(routeUtils.getProtectedContactListRoutePath());
     }
+
+    return Astro.redirect(routeUtils.getProtectedSavedSuccessfullyNotificationRoutePath(
+      saveType,
+      "Danh sách liên hệ",
+      routeUtils.getProtectedContactListRoutePath()
+    ));
   }
 } catch (error) {
   if (error instanceof ValidationError) {
     Astro.locals.modelErrorMessagesStore.setErrorMessages(error.errorMessages);
   } else if (error instanceof NotFoundError) {
-    return Astro.redirect(routeUtils.getProtectedDashboardRoutePath());
+    return Astro.redirect(routeUtils.getNotFoundErrorRoutePath());
   } else {
     throw error;
   }

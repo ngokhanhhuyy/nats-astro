@@ -96,8 +96,15 @@ const routeUtils = {
 
   // Others.
   getNotFoundErrorRoutePath: () => "/404-not-found",
-  getCreatedOrUpdatedSuccessfullyRoutePath: () => "/luu-thanh-cong",
-  getDeletedSuccessfullyRoutePath
+  getProtectedSavedSuccessfullyNotificationRoutePath: (
+      saveType: "create" | "update" | "delete",
+      returningPageDisplayName: string,
+      returningUrl: string) => {
+    return "/quan-tri/luu-thanh-cong" +
+      `?saveType=${saveType}` +
+      `&returningPageDisplayName=${encodeURIComponent(returningPageDisplayName)}` +
+      `&returningUrl=${encodeURIComponent(returningUrl)}`;
+  },
 }
 
 export function useRouteUtils() {
