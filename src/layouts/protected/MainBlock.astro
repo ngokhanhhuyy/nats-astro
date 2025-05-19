@@ -12,7 +12,7 @@ type Props = {
   bodyPadding?: string | number | [number, number] | [number, number, number, number];
   bodyBorder?: boolean;
 } & HTMLAttributes<"div">;
-const { color = "success", ...props } = Astro.props;
+const { color = "success", "class": className, ...props } = Astro.props;
 
 // Dependencies.
 const { compute, joinHTMLClass } = useHTMLUtils();
@@ -45,7 +45,7 @@ const bodyComputedClass = compute<string | null>(() => {
       const [top, end, bottom, start] = props.bodyPadding;
       classNames.push(`pt-${top} pe-${end} pb-${bottom} ps-${start}`);
     }
-  } else {
+  } else if (props.bodyPadding != null) {
     classNames.push(`p-${props.bodyPadding}`);
   }
 
@@ -53,7 +53,10 @@ const bodyComputedClass = compute<string | null>(() => {
 });
 ---
 
-<div class="block d-flex flex-column">
+<div
+  {...props}
+  class={joinHTMLClass("block d-flex flex-column shadow-sm rounded-3", className)}
+>
   <div class={joinHTMLClass(headerComputedClass, "block-header")}>
     <span class={joinHTMLClass("fw-bold small h-auto pt-1", `text-${color}`)}>
       {props.title.toUpperCase()}

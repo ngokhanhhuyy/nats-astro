@@ -25,7 +25,7 @@ if (Astro.request.method.toLowerCase() === "post") {
     const token = await Astro.locals.services.authenticationService
       .generateTokenAsync(model.toRequestDto());
     Astro.cookies.set("Authorization", `Bearer ${token}`);
-    return Astro.redirect("/");
+    return Astro.redirect(routeUtils.getProtectedDashboardRoutePath());
   } catch (error) {
     if (error instanceof ValidationError || error instanceof OperationError) {
       Astro.locals.modelErrorMessagesStore.setErrorMessages(error.errorMessages);

@@ -29,15 +29,15 @@ const pageTitle = compute<string>(() => `${model.saveTypeDisplayName} dữ liệ
 ---
 
 <ProtectedLayout pageTitle={pageTitle}>
-  <div class="row g-3">
-    <div class="col col-12">
-      <MainBlock title={pageTitle} bodyPadding={0}>
+  <div class="row g-3 justify-content-center">
+    <div class="col col-lg-5 col-md-6 col-sm-8 col-12">
+      <MainBlock title={pageTitle} bodyPadding={0} class="shadow-sm">
         <div class="row g-3 p-3">
           <div class={joinHTMLClass(
             "col col-auto d-flex flex-shrink-0",
             "justify-content-center align-items-center text-success"
           )}>
-            <i class="bi bi-info-circle-fill fs-2"></i>
+            <i class="bi bi-info-circle-fill fs-2 ms-2"></i>
           </div>
 
           <div class="col">
@@ -47,12 +47,20 @@ const pageTitle = compute<string>(() => `${model.saveTypeDisplayName} dữ liệ
             <a href={model.returningUrl} id="returning-url">
               {model.returningPageDisplayName}
             </a> trong <span id="counter">[5]</span> giây.
+            <br/>
+            <span class="opacity-50" id="hint-text">
+              Hãy bấm vào nút phía dưới nếu trang không tự động chuyển.
+            </span>
           </div>
         </div>
 
-        <div class="row g-0 border-top border-success-subtle">
-          <div class="col col-12 p-2 d-flex justify-content-end">
-            <a href={model.returningUrl} class="btn btn-success btn-sm">
+        <div class="row g-0 border-top border-success-subtle justify-content-end">
+          <div class="col col-auto p-2 d-flex justify-content-end">
+            <a
+              href={model.returningUrl}
+              id="returning-button"
+              class="btn btn-success btn-sm disabled"
+            >
               {model.returningPageDisplayName}
             </a>
           </div>
@@ -80,8 +88,8 @@ const pageTitle = compute<string>(() => `${model.saveTypeDisplayName} dữ liệ
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const counterElement = document.getElementById("counter") as HTMLSpanElement;
-    const returningAnchorElement = document
-      .getElementById("returning-url") as HTMLAnchorElement;
+    const returningButtonElement = document
+      .getElementById("returning-button") as HTMLAnchorElement;
     let count = parseInt(counterElement.textContent?.replace(/\[(.*)\]/, "$1") ?? "5");
     if (!count) {
       count = 5;
@@ -93,7 +101,8 @@ const pageTitle = compute<string>(() => `${model.saveTypeDisplayName} dữ liệ
 
       if (count === 0) {
         clearInterval(interval);
-        // location.href = returningAnchorElement.href;
+        returningButtonElement.classList.remove("disabled");
+        location.href = returningButtonElement.href;
       }
     }, 1000)
   });
